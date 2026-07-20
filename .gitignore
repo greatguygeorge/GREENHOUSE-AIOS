@@ -1,0 +1,30 @@
+# Environment secrets
+.env
+.env.*
+
+# API keys and credentials
+credentials/
+secrets/
+*.key
+*.pem
+
+# n8n data
+.n8n/
+
+# Docker data
+docker-volumes/
+
+# Database files
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# Operating system files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+temp/
+tmp/

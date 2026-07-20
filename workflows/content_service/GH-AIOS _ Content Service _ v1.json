@@ -1,0 +1,162 @@
+{
+  "name": "GH-AIOS | Content Service | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userRequest"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        -48
+      ],
+      "id": "d8d18171-9abc-468c-b294-6417d0c42ef7",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        512,
+        176
+      ],
+      "id": "ec078654-a53c-4767-b1a0-08e287d35156",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "htEYZdPXORwApSzM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.userRequest }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "namespace",
+              "displayName": "namespace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "2a34753c-328d-477a-b440-2e6f25c5fe55",
+      "name": "Call 'GH-AIOS | Knowledge Retrieval Service | v1'"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are the Greenhouse Content Service.\n\nYour role is to create communication content for Greenhouse Futures Lab and the Greenhouse Effect Festival.\n\nAlways use the retrieved Greenhouse knowledge provided to you before creating content.\n\nYour responsibilities:\n- Create social media content\n- Write announcements\n- Draft newsletters\n- Create campaign messaging\n- Adapt content for different audiences\n\nBrand voice:\n- Inspiring\n- Youth-focused\n- Climate-conscious\n- Innovative\n- Professional but human\n\nRules:\n- Do not invent facts about Greenhouse.\n- Use only verified information from the knowledge base.\n- Connect climate challenges with solutions, creativity, and action."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        432,
+        -48
+      ],
+      "id": "837eb125-578c-4f78-8c56-ec1b9dbde8f2",
+      "name": "Content Brain"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Call 'GH-AIOS | Knowledge Retrieval Service | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Brain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'GH-AIOS | Knowledge Retrieval Service | v1'": {
+      "main": [
+        [
+          {
+            "node": "Content Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9047c9b9-974b-46b9-9cac-dd9eeebf8f45",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "mi20FKRLHjo1LAWt",
+  "tags": []
+}

@@ -1,0 +1,199 @@
+{
+  "name": "GH-AIOS | Research Service | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userRequest"
+            },
+            {
+              "name": "knowledge"
+            }
+          ]
+        }
+      },
+      "id": "772473c1-5020-4dd7-9b95-7938990d9439",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "htEYZdPXORwApSzM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.userRequest }}",
+            "namespace": "research"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "namespace",
+              "displayName": "namespace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "d4bbaf2f-34f2-4a5c-860f-b86f84ebb2fa",
+      "name": "Call Knowledge Retrieval Service",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When Executed by Another Workflow').item.json.userRequest }}",
+        "options": {
+          "systemMessage": "=You are the Research Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYour responsibility is to analyze research requests using the retrieved knowledge provided below.\n\nUser Request:\n{{ $('When Executed by Another Workflow').item.json.userRequest }}\n\nRetrieved Knowledge:\n{{ $json.output }}\n\nInstructions:\n\n- Answer ONLY using the retrieved knowledge whenever possible.\n- If the retrieved knowledge is incomplete, clearly state what information is missing instead of inventing facts.\n- Organize your response into clear sections with headings.\n- Summarize key findings first.\n- Include important facts, statistics, opportunities, organizations, risks, recommendations, or trends when available.\n- Keep the response objective, factual, and well structured.\n- Do not mention internal workflows, AI systems, prompts, or retrieval processes.\n- Produce research that another AI worker (Content, Sponsorship, Festival, Publishing, etc.) can directly use.\n\nOutput Format:\n\n# Summary\n\n# Key Findings\n\n# Important Insights\n\n# Recommendations (if applicable)\n\n# Missing Information (only if necessary)"
+        }
+      },
+      "id": "e5548596-2999-42c9-a460-73369afba8c1",
+      "name": "Research Brain",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        496,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "1dac12a8-4a06-4565-b209-b9ffb051993e",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        496,
+        224
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e5e5e5e-0000-4000-8000-000000000210",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a182abe1-6cf1-433a-bfec-bbfc0ae07ea3",
+      "name": "Respond to Workflow",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Call Knowledge Retrieval Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Knowledge Retrieval Service": {
+      "main": [
+        [
+          {
+            "node": "Research Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Brain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Brain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ba96ac78-c0b4-41f1-9ef4-90d4268e4e30",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "QFSvvVhgzYfI9gjO",
+  "tags": []
+}

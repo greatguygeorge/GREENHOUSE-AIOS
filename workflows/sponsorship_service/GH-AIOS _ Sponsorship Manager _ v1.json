@@ -1,0 +1,335 @@
+{
+  "name": "GH-AIOS | Sponsorship Manager | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userRequest"
+            }
+          ]
+        }
+      },
+      "id": "6bc16a4d-9130-4307-9b8c-2c23773321a8",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "htEYZdPXORwApSzM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "=query\n{{ $json.queries.join(\", \") }}",
+            "namespace": "={{ $json.namespace }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "namespace",
+              "displayName": "namespace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "daafd1d4-9dd0-4279-a5d7-4a856250242e",
+      "name": "Call Knowledge Retrieval Service",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c3c3c3c-0000-4000-8000-000000000010",
+              "name": "userRequest",
+              "type": "string",
+              "value": "={{ $('When Executed by Another Workflow').item.json.userRequest }}"
+            },
+            {
+              "id": "3c3c3c3c-0000-4000-8000-000000000011",
+              "name": "knowledge",
+              "type": "string",
+              "value": "={{ $('Call Knowledge Retrieval Service').item.json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b971488-0045-4a79-8530-c612cf3bbaf8",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userRequest }}",
+        "options": {
+          "systemMessage": "=You are the GH-AIOS Sponsorship Manager.\n\nYour responsibility is to create professional sponsorship documents using ONLY the retrieved knowledge provided to you.\n\nYou will receive:\n\nUser Request:\n{{ $json.userRequest }}\n\nRetrieved Knowledge:\n{{ $json.knowledge }}\n\nRules:\n\n1. Use the Retrieved Knowledge as the primary source of truth.\n2. Do not invent facts, statistics, budgets, partnerships, timelines, or achievements that are not contained in the Retrieved Knowledge.\n3. If the Retrieved Knowledge is insufficient to complete the request, clearly state what additional information is required instead of making assumptions.\n4. Produce polished, professional sponsorship documents suitable for NGOs, foundations, government agencies, corporations, and development partners.\n5. Do not mention internal systems, AI agents, databases, vector stores, or retrieval processes.\n6. Return only the requested document."
+        }
+      },
+      "id": "e35dd1de-a770-4249-93c3-11e16234d0eb",
+      "name": "Sponsorship Manager",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1168,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "d08c9280-bae3-4351-a504-524b07801393",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        224
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f6f6f6f-0000-4000-8000-000000000020",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5dfb3bb8-e574-4393-8ad2-f419f7cacf56",
+      "name": "Return",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kPhmNtwxB9fQKGEp",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kPhmNtwxB9fQKGEp",
+          "cachedResultName": "GH-AIOS | Query Generator | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.userRequest }}"
+          },
+          "matchingColumns": [
+            "userRequest"
+          ],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "25aff9f0-8be0-480b-9420-4076a317c2bd",
+      "name": "Call 'GH-AIOS | Query Generator | v1'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d3db02f-8d89-45aa-9908-70cdf3779cd9",
+              "name": "userRequest",
+              "value": "={{ $json.userRequest }}",
+              "type": "string"
+            },
+            {
+              "id": "846e9dd0-1348-47f2-82b1-645e56f969ab",
+              "name": "namespace",
+              "value": "sponsorship",
+              "type": "string"
+            },
+            {
+              "id": "cfd87dc8-aaea-414f-8ad9-65fe4746a7db",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0da1efdb-f490-4e9f-a72c-0e1f347e2f09",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Knowledge Retrieval Service": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Sponsorship Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sponsorship Manager": {
+      "main": [
+        [
+          {
+            "node": "Return",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sponsorship Manager",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'GH-AIOS | Query Generator | v1'": {
+      "main": [
+        [
+          {
+            "node": "Call Knowledge Retrieval Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Call 'GH-AIOS | Query Generator | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8124f745-af40-4d82-a810-0adcf52d5c3d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "jxogVqSYaWi00UwD",
+  "tags": []
+}

@@ -1,0 +1,195 @@
+{
+  "name": "GH-AIOS | Publishing Service | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userRequest"
+            }
+          ]
+        }
+      },
+      "id": "d7b3a096-97a4-4e94-b5da-d875d9eb8086",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "htEYZdPXORwApSzM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.userRequest }}",
+            "namespace": "publishing"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "namespace",
+              "displayName": "namespace",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "93cddae3-6049-456b-9f6e-a82003537402",
+      "name": "Call Knowledge Retrieval Service",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When Executed by Another Workflow').item.json.userRequest }}",
+        "options": {
+          "systemMessage": "=You are the Publishing Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYou are the official content publishing and distribution specialist for the Greenhouse Effect Festival and Greenhouse Futures Lab.\n\nYou will receive:\n\n- userRequest: the user's request.\n- knowledge: information retrieved from the Greenhouse Knowledge Base.\n\nRetrieved Knowledge:\n\n{{ $json.output }}\n\nYour responsibilities include creating publication-ready content for:\n\n- LinkedIn\n- Instagram\n- Facebook\n- X (Twitter)\n- Threads\n- Substack\n- Email newsletters\n- Blog articles\n- Press releases\n- Website copy\n- Captions\n- Calls-to-action\n- Hashtags\n\nRules:\n\n1. Always use the retrieved knowledge as the primary source whenever relevant.\n\n2. If the retrieved knowledge is insufficient, improve the content using professional marketing, storytelling, copywriting, and communication best practices without inventing Greenhouse-specific facts.\n\n3. Adapt the writing style to the platform requested by the user.\nPlatform Guidelines:\n\n• LinkedIn\n  - Professional and insightful\n  - 300–600 words\n  - Strong opening hook\n  - Paragraph spacing\n  - End with a thoughtful CTA\n  - 3–8 relevant hashtags\n\n• Instagram\n  - Conversational\n  - Short paragraphs\n  - Emojis where appropriate\n  - Strong CTA\n  - 5–15 hashtags\n\n• Facebook\n  - Community-focused\n  - Friendly tone\n  - Moderate length\n\n• X (Twitter)\n  - Concise\n  - High-impact\n  - If appropriate, produce a thread.\n\n• Threads\n  - Conversational\n  - Storytelling style\n\n• Substack\n  - Long-form\n  - Educational\n  - Rich storytelling\n  - Well-structured headings\n\n• Email\n  - Professional\n  - Subject line\n  - Greeting\n  - Body\n  - CTA\n  - Signature\n\n• Press Release\n  - Formal\n  - Journalistic structure\n  - Headline\n  - Date\n  - Body\n  - Boilerplate\n\n\n4. Maintain the Greenhouse brand voice:\n   - Professional\n   - Inspiring\n   - Hopeful\n   - Youth-driven\n   - Climate-focused\n   - Action-oriented\n\n5. Never invent statistics, partnerships, sponsors, attendance figures, funding amounts, or historical events.\n\n6. Include strong calls-to-action whenever appropriate.\n\n7. Use headings, emojis, hashtags, or formatting only when appropriate for the requested platform.\n\n8. Never mention AI systems, prompts, databases, workflows, or internal processes.\n\n9. Return only the final publication-ready content."
+        }
+      },
+      "id": "4612d936-697c-498e-a6c1-01c8af456582",
+      "name": "Publishing Brain",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "a0c66e1d-137d-489b-94af-7b5737163fc0",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        480,
+        224
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e5e5e5e-0000-4000-8000-000000000410",
+              "name": "output",
+              "type": "string",
+              "value": "={{ $json.output }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "52d3ebd3-ba1d-4021-993f-e92952203d17",
+      "name": "Respond to Workflow",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Call Knowledge Retrieval Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Knowledge Retrieval Service": {
+      "main": [
+        [
+          {
+            "node": "Publishing Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publishing Brain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Publishing Brain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1282a145-d1f0-4edd-aff1-c49f7c8ca646",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "M9VSRj6R5FwmnWhg",
+  "tags": []
+}

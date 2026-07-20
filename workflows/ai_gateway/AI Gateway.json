@@ -1,0 +1,537 @@
+{
+  "name": "AI Gateway",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        176
+      ],
+      "id": "02e6cc7a-89d1-42bb-a270-30597b3cd84b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Create an Instagram caption for the Greenhouse Effect Festival announcing that volunteer applications are now open.",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the Greenhouse AI Skill Router.\n\nYour ONLY responsibility is to determine which specialist service should handle the user's request.\n\nChoose based on the PRIMARY ACTION the user wants to perform, not the topic.\n\n--------------------------------------------------\nSPECIALIST SERVICES\n--------------------------------------------------\n\ncontent\nUse when the user wants to CREATE, DEVELOP or BRAINSTORM original content.\n\nExamples:\n- Content strategy\n- Campaign ideas\n- Content calendar\n- Messaging framework\n- Story ideas\n- Brand voice\n- Copy concepts\n- Creative direction\n- Brainstorm captions\n- Generate content ideas\n\nfestival\nUse when the user wants to plan, organize or improve a festival or event.\n\nExamples:\n- Festival programme\n- Visitor experience\n- Logistics\n- Operations\n- Venue planning\n- Speaker planning\n- Workshops\n- Climate installations\n- Event schedules\n\nsponsorship\nUse when the user wants sponsorship or partnership materials.\n\nExamples:\n- Sponsorship proposal\n- Partnership proposal\n- Sponsor package\n- Funding request\n- Partnership letter\n- Corporate outreach\n\nresearch\nUse when the user wants information gathered, analyzed or summarized.\n\nExamples:\n- Research\n- Reports\n- Climate analysis\n- Fact checking\n- Best practices\n- Literature review\n- Comparisons\n- Recommendations based on evidence\n\npublishing\nUse when the user wants EXISTING content adapted, formatted or optimized for a publishing platform.\n\nExamples:\n- LinkedIn post\n- Instagram caption\n- Facebook post\n- X post\n- Threads post\n- Blog formatting\n- Substack article\n- Newsletter formatting\n- Email\n- Press release\n- Hashtags\n- CTA optimization\n- Platform-specific formatting\n\n--------------------------------------------------\nIMPORTANT ROUTING RULES\n--------------------------------------------------\n\nIf the request explicitly mentions a publishing platform\n(LinkedIn, Instagram, Facebook, X, Twitter, Threads, Substack, Email, Newsletter, Blog, Press Release),\n\nALWAYS choose:\n\npublishing\n\neven if the user is asking to write content.\n\nOnly choose content when the user is creating ideas, messaging, campaigns, strategy or original content without requesting a publishing platform.\n\nReturn only structured JSON.\n\nExample:\n\n{\n  \"skill\":\"publishing\"\n}"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Write a LinkedIn post announcing the Greenhouse Effect Festival."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        224,
+        176
+      ],
+      "id": "bfa2d796-212d-4873-ba52-fe9c4a59d10f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"skill\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"content\",\n        \"festival\",\n        \"sponsorship\",\n        \"research\",\n        \"publishing\"\n      ]\n    },\n    \"userRequest\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"skill\",\n    \"userRequest\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        400
+      ],
+      "id": "8de7d117-2f8e-4991-a46b-fd0e3dc5473c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        240,
+        400
+      ],
+      "id": "034819f6-87c5-48ad-a461-a1b161969c1a",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.skill }}",
+                    "rightValue": "content",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9e39083c-46d9-4f70-860c-3d26f63dc88f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "content"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2d1345d1-6f71-4b4a-a61c-f8e5984c5c0c",
+                    "leftValue": "={{ $json.output.skill }}",
+                    "rightValue": "festival",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "festival"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2412adb1-2c02-42c3-9d60-960051f50a3a",
+                    "leftValue": "={{ $json.output.skill }}",
+                    "rightValue": "sponsorship",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "sponsorship"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "32b3aa29-f4d2-492a-881a-260a34f2a3d0",
+                    "leftValue": "={{ $json.output.skill }}",
+                    "rightValue": "research",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "research"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "71b1c6ec-81e0-46f1-b690-e8664a7855fa",
+                    "leftValue": "={{ $json.output.skill }}",
+                    "rightValue": "publishing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "publishing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        128
+      ],
+      "id": "ca84a856-04b1-40de-a99c-1d225888cc05",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "mi20FKRLHjo1LAWt",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/mi20FKRLHjo1LAWt",
+          "cachedResultName": "GH-AIOS | Content Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.output.skill }}"
+          },
+          "matchingColumns": [
+            "userRequest"
+          ],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -208
+      ],
+      "id": "58ed6010-5b4f-4780-ad24-1457397141f7",
+      "name": "Call 'Content Service'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "jxogVqSYaWi00UwD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/jxogVqSYaWi00UwD",
+          "cachedResultName": "GH-AIOS | Sponsorship Manager | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.output.userRequest }}"
+          },
+          "matchingColumns": [
+            "userRequest"
+          ],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        176
+      ],
+      "id": "6d50d248-671f-45e9-ae94-f4462f3488c0",
+      "name": "Call 'GH-AIOS | Sponsorship Manager | v1'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QFSvvVhgzYfI9gjO",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QFSvvVhgzYfI9gjO",
+          "cachedResultName": "GH-AIOS | Research Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.output.userRequest }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "knowledge",
+              "displayName": "knowledge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        368
+      ],
+      "id": "1d12b09a-ee2c-425f-846e-edeb396e2164",
+      "name": "Call 'GH-AIOS | Research Service | v1'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZMJmEmQREmxvonL4",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ZMJmEmQREmxvonL4",
+          "cachedResultName": "GH-AIOS | Festival Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.output.userRequest }}"
+          },
+          "matchingColumns": [
+            "userRequest"
+          ],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -16
+      ],
+      "id": "dcfa7456-ffc0-4bb6-9964-895f6e9374b9",
+      "name": "Call 'GH-AIOS | Festival Service | v1'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "M9VSRj6R5FwmnWhg",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/M9VSRj6R5FwmnWhg",
+          "cachedResultName": "GH-AIOS | Publishing Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userRequest": "={{ $json.output.userRequest }}"
+          },
+          "matchingColumns": [
+            "userRequest"
+          ],
+          "schema": [
+            {
+              "id": "userRequest",
+              "displayName": "userRequest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        560
+      ],
+      "id": "bec718cf-8674-46dc-9932-450fc2f7f36d",
+      "name": "Call 'GH-AIOS | Publishing Service | v1'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Call 'Content Service'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'GH-AIOS | Festival Service | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'GH-AIOS | Sponsorship Manager | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'GH-AIOS | Research Service | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'GH-AIOS | Publishing Service | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8403fb8b-bff5-4018-b848-a318a2024649",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "BiKiBq9plwyRFtvT",
+  "tags": []
+}

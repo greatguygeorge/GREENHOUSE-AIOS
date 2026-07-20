@@ -1,0 +1,166 @@
+{
+  "name": "GH-AIOS | Query Generator | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userRequest"
+            }
+          ]
+        }
+      },
+      "id": "38a2152c-473f-406b-91de-0dbecbf9716f",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userRequest }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are the GH-AIOS Query Generator.\n\nROLE\n\nYour only responsibility is to convert a user's request into high-quality semantic search queries for the Greenhouse AI knowledge base.\n\nYou DO NOT answer the user's request.\n\nYou DO NOT create content.\n\nYou DO NOT summarize.\n\nYou DO NOT explain.\n\nYou ONLY identify the concepts that should be searched.\n\n--------------------------------------------------\n\nRULES\n\n1. Extract the main concepts, entities, initiatives, organizations, projects, and topics.\n\n2. Remove action words such as:\n- write\n- create\n- generate\n- make\n- explain\n- design\n- produce\n- build\n\n3. Keep only meaningful search concepts.\n\n4. Prefer the official Greenhouse terminology whenever possible.\n\nExamples:\n\nUse\n\nGreenhouse Effect Festival\n\ninstead of\n\nfestival\n\nUse\n\nGreenhouse Futures Lab\n\ninstead of\n\nlab\n\n5. Return between 1 and 6 search queries.\n\n6. Each query should be concise.\n\n7. Never include explanations.\n\n8. Never include numbering.\n\n9. Never include markdown.\n\n10. Return ONLY valid JSON matching the required schema.\n\n--------------------------------------------------\n\nExamples\n\nUser Request:\n\nWrite a sponsorship proposal for Nigerian Conservation Foundation for the Greenhouse Effect Festival.\n\nOutput\n\n{\n  \"queries\": [\n    \"Greenhouse Effect Festival\",\n    \"Greenhouse Futures Lab\",\n    \"Nigeria Conservation Foundation\",\n    \"Climate Change Initiative\"\n  ]\n}\n\n--------------------------------------------------\n\nUser Request\n\nCreate a LinkedIn post announcing the festival.\n\nOutput\n\n{\n  \"queries\": [\n    \"Greenhouse Effect Festival\",\n    \"Festival Overview\",\n    \"Brand Voice\"\n  ]\n}\n\n--------------------------------------------------\n\nUser Request\n\nWhat is the Greenhouse Futures Lab?\n\nOutput\n\n{\n  \"queries\": [\n    \"Greenhouse Futures Lab\"\n  ]\n}\n\n--------------------------------------------------\n\nUser Request\n\nGenerate sponsorship packages for MTN.\n\nOutput\n\n{\n  \"queries\": [\n    \"Sponsorship Packages\",\n    \"Greenhouse Effect Festival\",\n    \"Partnership Benefits\"\n  ]\n}\n\n--------------------------------------------------\n\nAlways return ONLY valid JSON.\n\nNever return prose.\n\nNever answer the user's request.\n\nNever wrap the JSON in markdown.\n\nReturn exactly one JSON object matching the required schema."
+        }
+      },
+      "id": "85cd9105-a671-43a0-9b21-296733bcb550",
+      "name": "Query Generator AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "a19f6d58-703b-432d-95e3-65a005cd7c24",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        240,
+        224
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "lBnTispJJuo4eQ3w",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"queries\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\"queries\"]\n}"
+      },
+      "id": "ae914a76-cd0e-45f7-9eea-c88f48fdd19e",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e5e5e5e-0000-4000-8000-000000000110",
+              "name": "namespace",
+              "type": "string",
+              "value": "=sponsorship"
+            },
+            {
+              "id": "5e5e5e5e-0000-4000-8000-000000000111",
+              "name": "queries",
+              "type": "array",
+              "value": "={{ $json.output.queries }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5408ef77-e9bb-42cf-a936-f6fab6730ab1",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Query Generator AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Generator AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Query Generator AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Query Generator AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "00bb8e43-8346-4957-ac21-332accc06404",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "kPhmNtwxB9fQKGEp",
+  "tags": []
+}
