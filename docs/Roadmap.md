@@ -1,326 +1,206 @@
-\# GH-AIOS Roadmap
+# GH-AIOS Roadmap
 
+## Greenhouse AI Operating System
 
+This roadmap outlines the evolution of GH-AIOS from a modular AI workflow platform into a fully autonomous AI operating system for climate organizations.
 
-\## Greenhouse AI Operating System
+---
 
+# Released
 
+## GH-AIOS v1.0.0 — Initial Stable Release
 
-This document outlines the planned evolution of GH-AIOS from a modular AI workflow system into a complete climate intelligence operating system.
-
-
-
-\---
-
-
-
-\# Current Status
-
-
-
-\## GH-AIOS v1.0.0 — Stable Release
-
-
+### Foundation Layer
 
 Completed:
 
-
-
 ✅ AI Gateway
 
-
-
-✅ Skill-based routing
-
-
+✅ Skill-Based Routing
 
 ✅ Knowledge Retrieval Service
 
-
+✅ Research Service
 
 ✅ Content Service
 
-
-
-✅ Research Service
-
-
-
 ✅ Sponsorship Service
-
-
 
 ✅ Festival Service
 
-
-
 ✅ Publishing Service
 
+Established the first modular AI operating system architecture for the Greenhouse Effect Ecosystem.
 
+---
 
-\---
+## GH-AIOS v1.1.0 — Knowledge Ingestion Core
 
+### Learning Layer
 
+Completed:
 
-\# Phase 1 — Knowledge Expansion
+✅ Knowledge Acquisition Service (KAS)
 
+✅ Knowledge Processing Pipeline
 
+✅ Knowledge Storage Service (KSS)
 
-\## GH-AIOS v1.1.0
+✅ Website Connector
 
+✅ RSS Connector
 
+✅ Google Drive Connector
 
-Goal:
+✅ Standard Acquisition Contract
 
+✅ End-to-End Knowledge Ingestion Pipeline
 
+✅ PostgreSQL + pgvector Semantic Storage
 
-Transform GH-AIOS from a knowledge retrieval system into a knowledge acquisition system.
+This release transformed GH-AIOS from a knowledge retrieval platform into a continuously learning operating system capable of building persistent organizational memory.
 
+---
 
+# Current Development
 
-Planned capabilities:
+## GH-AIOS v1.2.0 — Knowledge Intelligence Core
 
+### Objective
 
-
-\- Automated document discovery
-
-\- Research source collection
-
-\- Web research workflows
-
-\- Document processing
-
-\- Knowledge ingestion pipeline
-
-\- Improved vector database management
-
-
-
-New Service:
-
-
-
-```
-
-Knowledge Acquisition Service
-
-```
-
-
-
-\---
-
-
-
-\# Phase 2 — Intelligence Expansion
-
-
-
-\## GH-AIOS v1.5
-
-
-
-Goal:
-
-
-
-Enable deeper collaboration between AI specialists.
-
-
+Transform stored knowledge into actionable organizational intelligence.
 
 Planned capabilities:
 
+- Knowledge Sources Registry
+- Knowledge Retrieval Service 2.0
+- Context Builder
+- Autonomous connector scheduling
+- Connector health monitoring
+- Duplicate detection
+- Knowledge freshness scoring
+- Source lifecycle management
 
+---
 
-\- Multi-service collaboration
+# Future Releases
 
-\- Cross-agent communication
+## GH-AIOS v1.3.0 — Operational Intelligence
 
-\- Research-to-content pipelines
+### Objective
 
-\- Automated proposal generation
+Connect organizational intelligence directly to AI specialists.
 
-\- Strategic planning workflows
+Planned capabilities:
 
-
+- AI Gateway integration
+- Cross-service collaboration
+- Research-to-content workflows
+- Proposal generation pipelines
+- Strategic planning workflows
+- Shared organizational memory
 
 New Services:
 
+- Operational Context Engine
+- Workflow Intelligence Layer
 
+---
 
-```
+## GH-AIOS v1.4.0 — Autonomous Operations
 
-Analytics Service
+### Objective
 
-
-
-Impact Measurement Service
-
-```
-
-
-
-\---
-
-
-
-\# Phase 3 — Autonomous Operations
-
-
-
-\## GH-AIOS v2.0
-
-
-
-Goal:
-
-
-
-Move from assisted intelligence to autonomous organizational support.
-
-
+Move from assisted intelligence toward autonomous organizational support.
 
 Planned capabilities:
 
-
-
-\- Continuous research monitoring
-
-\- Automated trend detection
-
-\- Knowledge updates
-
-\- Performance analysis
-
-\- Learning from previous outputs
-
-
+- Continuous research monitoring
+- Automated trend detection
+- Knowledge updates
+- Organizational memory growth
+- Performance analysis
+- Learning from previous outputs
 
 Architecture:
 
+Knowledge Sources
 
-
-```
+↓
 
 Knowledge Acquisition
 
+↓
 
+Knowledge Storage
 
-&#x20;       ↓
-
-
+↓
 
 Knowledge Retrieval
 
+↓
 
+AI Gateway
 
-&#x20;       ↓
-
-
+↓
 
 Specialist Services
 
-
-
-&#x20;       ↓
-
-
+↓
 
 Publishing
 
-
-
-&#x20;       ↓
-
-
+↓
 
 Analytics
 
-
-
-&#x20;       ↓
-
-
+↓
 
 Learning Loop
 
-```
+---
 
+# GH-AIOS v2.0.0 — Autonomous AI Operating System
 
+### Vision
 
-\---
+A complete AI operating system supporting climate organizations through persistent knowledge, autonomous learning and intelligent decision support.
 
+Core capabilities:
 
+- Continuous organizational learning
+- Multi-agent collaboration
+- Organizational intelligence
+- Analytics engine
+- Autonomous planning
+- Impact measurement
+- Performance monitoring
 
-\# Phase 4 — Greenhouse Intelligence Platform
+---
 
+# Long-Term Vision
 
+GH-AIOS aims to become the intelligence infrastructure powering climate organizations worldwide by combining:
 
-\## GH-AIOS v3.0
+- Artificial Intelligence
+- Organizational Memory
+- Knowledge Management
+- Research Automation
+- Operational Intelligence
+- Creative Communication
+- Community Engagement
+- Climate Innovation
 
+---
 
+## Development Philosophy
 
-Vision:
+Every capability inside GH-AIOS is first designed, tested and validated within the Greenhouse Effect Ecosystem before becoming a reusable capability for other organizations.
 
+This ensures that the operating system evolves from solving real operational challenges rather than hypothetical ones.
 
+---
 
-A complete AI operating system supporting climate innovation ecosystems.
+**GH-AIOS**
 
-
-
-Potential capabilities:
-
-
-
-\- Climate intelligence dashboard
-
-\- Organization memory
-
-\- Automated stakeholder intelligence
-
-\- Grant opportunity discovery
-
-\- Partnership matching
-
-\- Community engagement automation
-
-\- Impact reporting
-
-
-
-\---
-
-
-
-\# Long-Term Vision
-
-
-
-GH-AIOS aims to become the intelligence infrastructure behind climate organizations by combining:
-
-
-
-\- Artificial intelligence
-
-\- Knowledge management
-
-\- Research automation
-
-\- Creative communication
-
-\- Community engagement
-
-\- Environmental innovation
-
-
-
-\---
-
-
-
-\*\*GH-AIOS\*\*
-
-
-
-Building the intelligence layer for climate innovation.
-
+*Building the intelligence infrastructure for climate innovation.*

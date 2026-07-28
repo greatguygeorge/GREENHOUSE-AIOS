@@ -1,0 +1,284 @@
+{
+  "name": "GH-AIOS | KAS | Knowledge Processing Pipeline | v1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "8bfc9dc7-1ccf-4180-996a-85ebb748857b",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ic1",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{$json.executionId}}"
+            },
+            {
+              "id": "ic2",
+              "name": "startedAt",
+              "type": "string",
+              "value": "={{$json.startedAt}}"
+            },
+            {
+              "id": "140a67ca-c46b-43a9-9763-04646fede9b3",
+              "name": "request",
+              "value": "={{ $json.request }}",
+              "type": "object"
+            },
+            {
+              "id": "c88e79b5-8d53-4f32-9780-5bb319f81aec",
+              "name": "content",
+              "value": "={{ $json.extraction }}",
+              "type": "object"
+            },
+            {
+              "id": "b2e7982b-a636-4972-bb6a-933debd0139e",
+              "name": "metadata",
+              "value": "={{ $json.metadata }}",
+              "type": "object"
+            },
+            {
+              "id": "821acdd9-0c75-4c2e-a16d-093281edd370",
+              "name": "processingStarted",
+              "value": "={{ $now }}",
+              "type": "string"
+            },
+            {
+              "id": "f8dfb9ba-09a7-497f-923a-0f80ce786a66",
+              "name": "status",
+              "value": "processing",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "7dc90131-d3de-4ff1-aae9-193888b2fcee",
+      "name": "Initialize Processing Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst required = [\n  \"executionId\",\n  \"request\",\n];\n\nfor (const field of required) {\n  if (!(field in item)) {\n    throw new Error(`Missing required field: ${field}`);\n  }\n}\n\nif (!item.request.connector) {\n  throw new Error(\"Missing connector.\");\n}\n\nif (!item.request.source) {\n  throw new Error(\"Missing source.\");\n}\n\nif (!item.extraction) {\n  throw new Error(\"No extracted content received.\");\n}\n\nif (!item.extraction.rawContent) {\n  throw new Error(\"rawContent missing.\");\n}\n\nreturn $input.all();"
+      },
+      "id": "d973fcd5-f232-4b53-b167-8e440b266451",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nitem.document = {\n  id: item.sourceId,\n  title: item.sourceName,\n  source: item.connector,\n  url: item.sourceUrl,\n  content: item.extraction.rawContent,\n  contentType: item.extraction.contentType,\n  retrievedAt: item.extraction.retrievedAt,\n};\n\nreturn [{\n  json: item\n}];"
+      },
+      "id": "1478f554-ac9c-4771-9694-f25029316852",
+      "name": "Normalize Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nlet text = item.document.content;\n\n// remove scripts\ntext = text.replace(/<script[\\s\\S]*?<\\/script>/gi, \"\");\n\n// remove styles\ntext = text.replace(/<style[\\s\\S]*?<\\/style>/gi, \"\");\n\n// remove html tags\ntext = text.replace(/<[^>]+>/g, \" \");\n\n// collapse whitespace\ntext = text.replace(/\\s+/g, \" \").trim();\n\nitem.document.cleanedContent = text;\n\nreturn [{\n  json: item\n}];"
+      },
+      "id": "3d78a5dd-c1e6-4d96-975b-9459c75f726d",
+      "name": "Clean Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst text = item.document.cleanedContent;\n\nconst CHUNK_SIZE = 1200;\n\nconst chunks = [];\n\nfor (let i = 0; i < text.length; i += CHUNK_SIZE) {\n\n  chunks.push({\n    id: `${item.document.id}-${chunks.length}`,\n    index: chunks.length,\n    text: text.slice(i, i + CHUNK_SIZE)\n  });\n\n}\n\nitem.document.chunks = chunks;\nitem.document.chunkCount = chunks.length;\n\nreturn [{\n  json: item\n}];"
+      },
+      "id": "6b94de1e-941d-45d9-afd1-c0e793d73cfe",
+      "name": "Chunk Document",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sum1",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{$json.executionId}}"
+            },
+            {
+              "id": "sum2",
+              "name": "connector",
+              "type": "string",
+              "value": "{{$json.request.connector}}"
+            },
+            {
+              "id": "sum3",
+              "name": "sourceId",
+              "type": "string",
+              "value": "={{$json.request.source.id}}"
+            },
+            {
+              "id": "sum4",
+              "name": "sourceName",
+              "type": "string",
+              "value": "={{$json.resource.sourceName}}"
+            },
+            {
+              "id": "sum7",
+              "name": "status",
+              "type": "string",
+              "value": "completed"
+            },
+            {
+              "id": "sum9",
+              "name": "completedAt",
+              "type": "string",
+              "value": "={{$now}}"
+            },
+            {
+              "id": "sum5",
+              "name": "chunkCount",
+              "type": "number",
+              "value": "={{$json.chunkCount}}"
+            },
+            {
+              "id": "sum6",
+              "name": "chunks",
+              "type": "object",
+              "value": "={{$json.chunks}}"
+            },
+            {
+              "id": "07a258c2-2fcb-437d-8045-66563e302b2b",
+              "name": "sourcezUrl",
+              "value": "={{$json.resource.sourceUrl}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "8ab56796-c1c5-48d5-9a2b-5571c5fbad5c",
+      "name": "Return Processing Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Initialize Processing Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Processing Context": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Normalize Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Content": {
+      "main": [
+        [
+          {
+            "node": "Clean Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Content": {
+      "main": [
+        [
+          {
+            "node": "Chunk Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunk Document": {
+      "main": [
+        [
+          {
+            "node": "Return Processing Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "18d1daf7-ae58-4dc6-967b-dfc38ef8ef4c",
+  "meta": {
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "1se5IaOPI5D8pfqZ",
+  "tags": []
+}

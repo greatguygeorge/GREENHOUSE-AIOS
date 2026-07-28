@@ -1,0 +1,241 @@
+{
+  "name": "GH-AIOS | Knowledge Storage Service | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "processingResult",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "id": "59ca5517-6ccd-4e4d-bd76-5118c98680c4",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Confirmed contract from GH-AIOS | KAS | Knowledge Processing Pipeline | v1.0's\n// \"Return Processing Summary\" node, after the field-mapping fixes:\n//   executionId, connector, sourceId, sourceName, sourceUrl,\n//   status, completedAt, chunkCount, chunks: [{ id, index, text }]\nconst result = $input.first().json.processingResult;\n\nif (!result || !Array.isArray(result.chunks)) {\n  throw new Error('Knowledge Storage Service: processingResult.chunks is missing or not an array.');\n}\n\nreturn result.chunks.map(chunk => ({\n  json: {\n    executionId: result.executionId,\n    connector: result.connector,\n    sourceId: result.sourceId,\n    sourceName: result.sourceName,\n    sourceUrl: result.sourceUrl,\n    chunkId: chunk.id,\n    chunkIndex: chunk.index,\n    chunkText: chunk.text\n  }\n}));"
+      },
+      "id": "87fde56b-92ed-4af9-a8f3-2031145059da",
+      "name": "Split Into Chunk Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { content: { parts: [ { text: $json.chunkText } ] } } }}",
+        "options": {}
+      },
+      "id": "03771499-fa51-4c63-9ca8-aaa23a26db01",
+      "name": "Generate Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "68TAGnlr7XZFwI7n",
+          "name": "Google Gemini(PaLM) Api account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formats the embedding array as a pgvector literal string (e.g. \"[0.01,0.02,...]\")\n// and assembles the full row ready for insertion.\nconst prev = $('Split Into Chunk Items').item.json;\nconst embeddingValues = $json.embedding && $json.embedding.values;\n\nif (!Array.isArray(embeddingValues)) {\n  throw new Error('Knowledge Storage Service: Gemini API did not return embedding.values as an array.');\n}\n\nconst embeddingLiteral = '[' + embeddingValues.join(',') + ']';\n\nreturn [{\n  json: {\n    text: prev.chunkText,\n    metadata: {\n      executionId: prev.executionId,\n      connector: prev.connector,\n      sourceId: prev.sourceId,\n      sourceName: prev.sourceName,\n      sourceUrl: prev.sourceUrl,\n      chunkId: prev.chunkId,\n      chunkIndex: prev.chunkIndex,\n      embeddedAt: new Date().toISOString(),\n      embeddingModel: 'gemini-embedding-001'\n    },\n    embedding: embeddingLiteral\n  }\n}];"
+      },
+      "id": "c6da44ac-925b-492e-bd63-c3b9b03f8ab9",
+      "name": "Format Row for Insert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "greenhouse_knowledge_base",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "text": "={{ $json.text }}",
+            "metadata": "={{ JSON.stringify($json.metadata) }}",
+            "embedding": "={{ $json.embedding }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "embedding",
+              "displayName": "embedding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "cc143b21-56f1-461a-925c-497ae6dd0385",
+      "name": "Insert Into greenhouse_knowledge_base",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Ks70lg1ebKLZfFBL",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunkItems = $('Split Into Chunk Items').all();\nconst first = chunkItems[0]?.json || {};\nconst insertedCount = $input.all().length;\n\nreturn [{\n  json: {\n    executionId: first.executionId,\n    connector: first.connector,\n    sourceId: first.sourceId,\n    sourceName: first.sourceName,\n    sourceUrl: first.sourceUrl,\n    status: 'completed',\n    chunkCount: chunkItems.length,\n    chunksStored: insertedCount,\n    storageStatus: 'stored',\n    completedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "a71dd8d8-2796-4431-bb96-2530b409528a",
+      "name": "Return Storage Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Split Into Chunk Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Chunk Items": {
+      "main": [
+        [
+          {
+            "node": "Generate Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Embedding": {
+      "main": [
+        [
+          {
+            "node": "Format Row for Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Row for Insert": {
+      "main": [
+        [
+          {
+            "node": "Insert Into greenhouse_knowledge_base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Into greenhouse_knowledge_base": {
+      "main": [
+        [
+          {
+            "node": "Return Storage Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "65fc2f3f-3f36-4a7a-a7b9-d12745034b10",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "QPFWEw7lRFVypGYa",
+  "tags": []
+}

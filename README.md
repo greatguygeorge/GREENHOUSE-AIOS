@@ -1,512 +1,338 @@
-# GH-AIOS
+# Greenhouse AI Operating System (GH-AIOS)
 
-### Greenhouse AI Operating System
+> **An intelligent operating system for the Greenhouse Effect Ecosystem.**
 
+GH-AIOS is a modular AI operating system developed by **Greenhouse Futures Lab** to continuously acquire, organize, store, retrieve and reason over organizational knowledge.
 
-
-> **An autonomous AI operating system designed to help climate organizations think, research, create, plan, communicate, and continuously learn.**
-
-
+Unlike traditional AI assistants that rely solely on pre-trained models, GH-AIOS builds and maintains a persistent institutional memory capable of supporting climate innovation, research, operations, partnerships, sponsorships and decision-making across the Greenhouse Effect Ecosystem.
 
 ---
 
+# Vision
 
+GH-AIOS is being developed as the intelligent operating system powering the Greenhouse Effect Ecosystem.
 
-## Vision
+Its mission is to continuously acquire, process, store, retrieve and reason over organizational knowledge, enabling climate initiatives to preserve institutional memory and make better decisions through AI.
 
-
-
-GH-AIOS was created to become the digital operating system behind the **Greenhouse Futures Lab** and the **Greenhouse Effect Festival**.
-
-
-
-Rather than relying on a single AI assistant to perform every task, GH-AIOS distributes intelligence across specialized AI services, each responsible for one domain of expertise.
-
-
-
-The result is a modular AI ecosystem capable of supporting climate innovation, research, partnerships, festival operations, communications, and knowledge management from a single gateway.
-
-
+Greenhouse Futures Lab serves as the first production environment for GH-AIOS. Every capability is designed to solve real operational challenges within the ecosystem before being generalized for wider adoption.
 
 ---
 
-
-
-# Philosophy
-
-
-
-Most AI assistants answer questions.
-
-
-
-GH-AIOS performs work.
-
-
-
-Every request entering the system is routed to the specialist most capable of completing that task, allowing the platform to behave less like a chatbot and more like a collaborative digital organization.
-
-
-
----
-
-
-
-# Core Architecture
-
-
-
-```
-
-&#x20;                   USER
-
-&#x20;                     │
-
-&#x20;                     ▼
-
-          GH-AIOS Gateway
-
-                     │
-
-                     ▼
-
-        Knowledge Retrieval Service
-
-                     │
-
-     ┌───────────────┼────────────────┐
-
-     │               │                │
-     ▼               ▼                ▼
-
-Content        Sponsorship       Research
-
-     │
-
-     ├──────────────┐
-
-     ▼              ▼
-
-Festival       Publishing
-
-```
-
-
-
----
-
-
-
-# Current Specialist Services
-
-
+# Core Services
 
 ## AI Gateway
 
+The intelligent entry point into GH-AIOS.
 
+Responsible for:
 
-The central intelligence responsible for understanding user intent and routing every request to the appropriate specialist workflow.
-
-
-
----
-
-
-
-## Knowledge Retrieval Service
-
-
-
-Retrieves verified institutional knowledge from the Greenhouse knowledge base using semantic search.
-
-
-
-Responsibilities include:
-
-
-
-- Query generation
-
-- Context retrieval
-
-- Knowledge formatting
-
-- Retrieval orchestration
-
-
+- Request routing
+- Specialist selection
+- Context orchestration
+- AI model management
+- Service communication
 
 ---
 
+## Knowledge Acquisition Service (KAS)
 
+Coordinates autonomous knowledge acquisition.
 
-## Content Service
+Responsibilities:
 
-
-
-Responsible for developing original communication assets.
-
-
-
-Examples include:
-
-
-
-- Campaign concepts
-
-- Messaging
-
-- Storytelling
-
-- Climate narratives
-
-- Creative strategy
-
-- Content planning
-
-
+- Connector orchestration
+- Source execution
+- Standard acquisition payload generation
+- Processing Pipeline coordination
+- Knowledge Storage orchestration
+- Execution summaries
 
 ---
 
+## Knowledge Processing Pipeline
 
+Transforms raw knowledge into structured organizational intelligence.
 
-## Research Service
+Responsibilities:
 
-
-
-Transforms information into actionable intelligence.
-
-
-
-Capabilities include:
-
-
-
-- Research reports
-
-- Climate analysis
-
-- Fact checking
-
-- Summaries
-
-- Comparative studies
-
-- Strategic recommendations
-
-
+- Content normalization
+- HTML cleanup
+- Metadata preservation
+- Payload validation
+- Document chunk preparation
+- Standard processing contract
 
 ---
 
+## Knowledge Storage Service (KSS)
 
+Responsible for persistent semantic memory.
 
-## Sponsorship Service
+Responsibilities:
 
-
-
-Develops funding and partnership materials.
-
-
-
-Examples:
-
-
-
-- Sponsorship proposals
-
-- Partnership letters
-
-- Corporate outreach
-
-- Funding requests
-
-- Sponsor packages
-
-
+- Chunk management
+- Embedding generation
+- PostgreSQL storage
+- pgvector indexing
+- Metadata persistence
+- Storage summaries
 
 ---
 
+# Knowledge Connectors
 
+Current connectors:
 
-## Festival Service
+- Website Connector
+- RSS Connector
+- Google Drive Connector
 
-
-
-Supports every stage of event planning.
-
-
-
-Capabilities include:
-
-
-
-- Festival programming
-
-- Logistics
-
-- Visitor experience
-
-- Workshops
-
-- Speaker planning
-
-- Sustainability planning
-
-- Operational design
-
-
-
----
-
-
-
-## Publishing Service
-
-
-
-Optimizes content for specific communication platforms.
-
-
-
-Supported outputs include:
-
-
-
-- LinkedIn
-
-- Instagram
-
-- Facebook
-
-- X
-
-- Threads
+Planned connectors:
 
 - Email
-
+- Dropbox
+- OneDrive
+- Notion
+- GitHub
+- Slack
+- Airtable
+- Local Files
 - Newsletter
-
-- Substack
-
 - Blog
-
 - Press Releases
-
-
+- Substack
 
 ---
 
+# Current Capabilities
 
+GH-AIOS currently supports:
+
+## Knowledge Acquisition
+
+- Website crawling
+- RSS ingestion
+- Google Drive ingestion
+- Standard acquisition contracts
+
+---
+
+## Knowledge Processing
+
+- Content normalization
+- HTML cleaning
+- Metadata preservation
+- Intelligent chunk preparation
+
+---
+
+## Knowledge Storage
+
+- Semantic embeddings
+- PostgreSQL persistence
+- pgvector indexing
+- Organizational knowledge storage
+
+---
+
+## AI Specialists
+
+Current specialist services include:
+
+- Research Service
+- Festival Service
+- Sponsorship Service
+- Publishing Service
+- Knowledge Service
+
+---
+
+# System Architecture
+
+```
+Knowledge Sources
+        │
+        ▼
+Knowledge Connectors
+        │
+        ▼
+Knowledge Acquisition Service
+        │
+        ▼
+Knowledge Processing Pipeline
+        │
+        ▼
+Knowledge Storage Service
+        │
+        ▼
+PostgreSQL + pgvector
+        │
+        ▼
+Knowledge Retrieval Service (Upcoming)
+        │
+        ▼
+AI Specialists
+        │
+        ▼
+Users
+```
+
+---
 
 # Design Principles
 
-
-
 GH-AIOS follows five architectural principles.
 
+## Modular
 
-
-### Modular
-
-
-
-Every specialist is independent.
-
-
-### Replaceable
-
-
-
-Individual services can evolve without affecting the rest of the platform.
-
-
-
-### Knowledge-Driven
-
-
-
-Specialists retrieve verified knowledge before generating responses whenever possible.
-
-
-
-### Scalable
-
-
-
-New specialist services can be added without redesigning the architecture.
-
-
-
-### Human-Centered
-
-
-
-AI augments decision-making rather than replacing human judgement.
-
-
+Every service performs one responsibility and can evolve independently.
 
 ---
 
+## Replaceable
 
-
-# Current Version
-
-
-
-```
-
-GH-AIOS v1.0.0
-
-```
-
-
-
-Status:
-
-
-
-**Stable**
-
-
+Individual services can be upgraded without affecting the rest of the operating system.
 
 ---
 
+## Knowledge-Driven
 
-
-# Roadmap
-
-
-
-### Version 1.1
-
-
-
-- Knowledge Acquisition Service
-
-- Improved routing intelligence
-
-- Cross-service collaboration
-
-- Expanded knowledge base
-
-
-
-### Version 2
-
-
-
-- Continuous learning
-
-- Autonomous research
-
-- Multi-agent collaboration
-
-- Analytics engine
-
-- Performance monitoring
-
-- Long-term memory
-
-
+Services retrieve verified organizational knowledge before generating responses whenever possible.
 
 ---
 
+## Scalable
 
+New services and connectors can be added without redesigning the platform.
+
+---
+
+## Human-Centered
+
+AI augments human decision-making rather than replacing it.
+
+---
 
 # Technology Stack
 
-
-
 - n8n
-
 - PostgreSQL
-
-- PGVector
-
+- pgvector
 - Docker
-
-- Groq
-
 - Google Gemini
-
+- Groq
 - AI Gateway Architecture
-
-- Semantic Retrieval
-
+- Semantic Embeddings
+- Vector Search
+- Modular Workflow Architecture
 - Markdown Knowledge Skills
 
-
-
 ---
 
-
-
-# Project Structure
-
-
+# Repository Structure
 
 ```
-
-Greenhouse-Ai-Os/
-
-
+Greenhouse-AI-OS/
 
 docs/
-
 knowledge/
-
 releases/
-
+services/
+connectors/
+workflows/
 skills/
 
-workflows/
-
-
-
 README.md
-
+CHANGELOG.md
+ROADMAP.md
 ```
-
-
 
 ---
 
+# Current Version
 
+```
+GH-AIOS v1.1.0
+```
+
+**Release Name**
+
+**Knowledge Ingestion Core**
+
+**Status**
+
+Stable Feature Release
+
+---
+
+# Roadmap
+
+## Version 1.2.0
+
+### Knowledge Intelligence Core
+
+- Knowledge Sources Registry
+- Knowledge Retrieval Service
+- Context Builder
+- Autonomous source scheduling
+- Connector health monitoring
+- Knowledge freshness management
+- Duplicate detection
+
+---
+
+## Version 1.3.0
+
+### Operational Intelligence
+
+- AI Gateway integration
+- Cross-service collaboration
+- Autonomous research
+- Long-term organizational memory
+- Workflow intelligence
+
+---
+
+## Version 2.0.0
+
+### Autonomous AI Operating System
+
+- Continuous learning
+- Multi-agent collaboration
+- Organizational intelligence
+- Analytics engine
+- Performance monitoring
+- Impact measurement
+- Autonomous ecosystem operations
+
+---
 
 # About Greenhouse Futures Lab
 
+Greenhouse Futures Lab is a climate innovation ecosystem dedicated to transforming environmental challenges into practical solutions through technology, research, creativity, entrepreneurship and community participation.
 
-
-Greenhouse Futures Lab is a climate innovation ecosystem dedicated to transforming environmental challenges into practical solutions through technology, research, creativity, entrepreneurship, and community participation.
-
-
-
-GH-AIOS serves as the intelligence layer powering this ecosystem.
-
-
+GH-AIOS serves as the intelligent operating system powering this ecosystem.
 
 ---
-
-
 
 # Author
 
-
-
 **George Olumuyiwa Abogan**
-
-
 
 Founder — Greenhouse Futures Lab
 
-
-
 Creator of GH-AIOS
-
-
 
 ---
 
+# Philosophy
 
+> **Build for Greenhouse first. Generalize later.**
 
-**"Climate problems require systems thinking. GH-AIOS was built to become one of those systems."**
+Every capability within GH-AIOS is first designed to solve a real operational challenge inside the Greenhouse Effect Ecosystem before becoming a reusable capability for other organizations.
 
+This ensures that the operating system is shaped by real-world use rather than hypothetical requirements.
+
+---
+
+> **"Climate problems require systems thinking. GH-AIOS was built to become one of those systems."**

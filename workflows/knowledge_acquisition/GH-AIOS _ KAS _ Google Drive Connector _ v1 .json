@@ -1,0 +1,219 @@
+{
+  "name": "GH-AIOS | KAS | Google Drive Connector | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "job",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "id": "f053f69a-5f44-4deb-9ef1-b9cf7d1dc7c9",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Reads from job.request.source, same contract as Website and RSS Connectors:\n// { id, name, url } — where for Google Drive, \"url\" may be a raw file ID\n// or a full Drive sharing link.\nconst job = $input.first().json.job;\nconst source = job && job.request && job.request.source;\n\nif (!source || !source.url) {\n  throw new Error('Google Drive Connector: job.request.source.url (file ID or Drive link) is missing.');\n}\n\nconst raw = String(source.url).trim();\nlet fileId = null;\n\nconst dMatch = raw.match(/\\/d\\/([a-zA-Z0-9_-]+)/);\nconst idParamMatch = raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);\n\nif (dMatch) {\n  fileId = dMatch[1];\n} else if (idParamMatch) {\n  fileId = idParamMatch[1];\n} else if (/^[a-zA-Z0-9_-]{10,}$/.test(raw)) {\n  fileId = raw;\n} else {\n  throw new Error(`Google Drive Connector: could not extract a file ID from \"${raw}\".`);\n}\n\nreturn [{\n  json: {\n    executionId: job.executionId,\n    sourceId: source.id || null,\n    title: source.name || '',\n    driveUrl: raw,\n    fileId\n  }\n}];"
+      },
+      "id": "0021d125-1e99-4d52-a6a6-bbb1be30e7ce",
+      "name": "Receive Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.fileId }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "d555a1fd-f3e1-47be-bcd8-0fac59029557",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Rzp02emGmpAbCv9N",
+          "name": "Google Drive account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "88cf098d-2a02-4431-99a6-e9e46f445205",
+      "name": "Extract File Content",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bsp1",
+              "name": "sourceType",
+              "type": "string",
+              "value": "google_drive"
+            },
+            {
+              "id": "bsp2",
+              "name": "sourceUrl",
+              "type": "string",
+              "value": "={{ $('Receive Request').item.json.driveUrl }}"
+            },
+            {
+              "id": "bsp3",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $('Download File').item.json.name || $('Receive Request').item.json.title }}"
+            },
+            {
+              "id": "bsp4",
+              "name": "rawContent",
+              "type": "string",
+              "value": "={{ $json.text || $json.data }}"
+            },
+            {
+              "id": "bsp5",
+              "name": "retrievedAt",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "bsp6",
+              "name": "connectorMetadata",
+              "type": "object",
+              "value": "={{ { fileId: $('Receive Request').item.json.fileId, mimeType: $('Download File').item.json.mimeType || null } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "914988d2-0d70-43e6-bb8f-62280ddc8245",
+      "name": "Build Standard Acquisition Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "601f89d8-8c91-4891-a489-697cb480f686",
+      "name": "Return Payload to KAS Orchestrator",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Receive Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Request": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Extract File Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract File Content": {
+      "main": [
+        [
+          {
+            "node": "Build Standard Acquisition Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Standard Acquisition Payload": {
+      "main": [
+        [
+          {
+            "node": "Return Payload to KAS Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3f6ed336-2d0e-4f90-83cc-ac92a9915a6c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "tjd47Y4U0UoP06Q0",
+  "tags": []
+}

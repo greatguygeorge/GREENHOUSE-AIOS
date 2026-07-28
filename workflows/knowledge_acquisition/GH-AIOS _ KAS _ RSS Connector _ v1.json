@@ -1,0 +1,420 @@
+{
+  "name": "GH-AIOS | KAS | RSS Connector | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "job",
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "id": "57b7e375-e8b1-4f15-85dd-58195d28385e",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst channel = item.rss.channel;\n\nconst entries = Array.isArray(channel.item)\n  ? channel.item\n  : [channel.item];\n\nreturn [\n  {\n    json: {\n      executionId: item.executionId,\n      startedAt: item.startedAt,\n      triggerType: item.triggerType,\n\n      request: item.request,\n\n      connector: item.connector,\n\n      extraction: {\n        contentType: \"application/rss+xml\",\n\n        feed: {\n          title: channel.title,\n          description: channel.description,\n          link: channel.link,\n        },\n\n        entries: entries.map(entry => ({\n          title: entry.title,\n          link: entry.link,\n          description: entry.description,\n          publishedAt: entry.pubDate,\n          guid: entry.guid,\n        })),\n\n        metadata: {\n          retrievedAt: new Date().toISOString(),\n          entryCount: entries.length,\n          status: \"success\",\n        }\n      }\n    }\n  }\n];"
+      },
+      "id": "86181e4a-4907-40a6-ad69-7fd239c17b1a",
+      "name": "Extract Feed Entries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bsp1",
+              "name": "sourceType",
+              "type": "string",
+              "value": "rss"
+            },
+            {
+              "id": "bsp2",
+              "name": "sourceUrl",
+              "type": "string",
+              "value": "={{ $json.url }}"
+            },
+            {
+              "id": "bsp3",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "id": "bsp4",
+              "name": "rawContent",
+              "type": "string",
+              "value": "={{ $json.summary }}"
+            },
+            {
+              "id": "bsp5",
+              "name": "retrievedAt",
+              "type": "string",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "id": "bsp6",
+              "name": "connectorMetadata",
+              "type": "object",
+              "value": "={{\n{\n  source: $json.source,\n  guid: $json.guid,\n  publishedAt: $json.publishedAt,\n  contentType: $json.contentType\n}\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ebd10161-0418-4477-8744-81d43ea17788",
+      "name": "Build Standard Acquisition Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a0d6053d-9a37-4847-85bd-151b3fb2c8ca",
+      "name": "Return Payload to KAS Orchestrator",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json.job;\n\nreturn [\n  {\n    json: {\n      executionId: item.executionId,\n      startedAt: item.startedAt,\n      triggerType: item.triggerType,\n\n      request: item.request,\n\n      connector: {\n        type: \"rss\",\n        name: \"RSS Connector\",\n        version: \"1.0\"\n      },\n\n      extraction: {\n        requestedAt: new Date().toISOString()\n      }\n    }\n  }\n];"
+      },
+      "id": "92eb46a8-ee10-4a65-85b8-0eb9a806d2e3",
+      "name": "Prepare Exraction Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.request.source.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Greenhouse-AIOS/1.0"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        352,
+        0
+      ],
+      "id": "dd47553b-d253-4f1a-873f-8c36f8deb503",
+      "name": "Fetch RSS Feed"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d685948c-f9d1-4f86-a4bf-511e4be7adb0",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "extraction.entries",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        928,
+        0
+      ],
+      "id": "b3c72289-04af-42cd-a510-4b2f9c810d38",
+      "name": "Split Out Entries "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a15a4416-e6b5-4301-9d24-c1e5e6ec7409",
+              "name": "title",
+              "value": "={{$json[\"extraction.entries\"].title}}",
+              "type": "string"
+            },
+            {
+              "id": "234cc15d-1b5f-496b-9a65-c75bfbc4e62b",
+              "name": "url",
+              "value": "={{$json[\"extraction.entries\"].link}}",
+              "type": "string"
+            },
+            {
+              "id": "8e905510-1551-4c67-9652-1fdd358f61b7",
+              "name": "summary",
+              "value": "={{$json[\"extraction.entries\"].description}}",
+              "type": "string"
+            },
+            {
+              "id": "d38281ce-14a8-4977-90c5-fa10e82ba2ec",
+              "name": "publishedAt",
+              "value": "={{$json[\"extraction.entries\"].publishedAt}}",
+              "type": "string"
+            },
+            {
+              "id": "8d3a07d6-dd63-44b0-baf5-6e1b46313402",
+              "name": "guild",
+              "value": "={{$json[\"extraction.entries\"].guid}}",
+              "type": "string"
+            },
+            {
+              "id": "4a0095a8-69e1-4914-93a1-f36acd27d159",
+              "name": "source",
+              "value": "={{$json.extraction.feed.title}}",
+              "type": "string"
+            },
+            {
+              "id": "b3e142dc-68b7-4c94-b0c5-984e1d6a7ad2",
+              "name": "sourceUrl",
+              "value": "={{$json.extraction.feed.link}}",
+              "type": "string"
+            },
+            {
+              "id": "010ac839-678a-4ac6-a48f-e1621698fa18",
+              "name": "contentType",
+              "value": "rss",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "a08a46d5-b2ab-4843-a560-04918633db37",
+      "name": "Normalize Article"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6a2ebf41-6da8-4cd8-83f8-b91daaab7b6c",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "be3233e1-272f-4d10-b791-9eccb632de6f",
+              "leftValue": "={{ $json.rawContent }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "128c3b09-0dd3-4c53-8659-5a08aa536c49",
+              "leftValue": "={{ $json.sourceUrl }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d111a694-f54d-42ca-8a18-dcd2660097be",
+              "leftValue": "={{ $json.rawContent.length }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1584,
+        0
+      ],
+      "id": "3b1f2d5a-16d8-4fe8-b333-0ea77720ea9a",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Exraction Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Feed Entries": {
+      "main": [
+        [
+          {
+            "node": "Split Out Entries ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Standard Acquisition Payload": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Exraction Context": {
+      "main": [
+        [
+          {
+            "node": "Fetch RSS Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch RSS Feed": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Extract Feed Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Entries ": {
+      "main": [
+        [
+          {
+            "node": "Normalize Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Article": {
+      "main": [
+        [
+          {
+            "node": "Build Standard Acquisition Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Return Payload to KAS Orchestrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8e435036-e65b-4b07-ba59-f906566db024",
+  "meta": {
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "9TsPAY6A2gpISoSA",
+  "tags": []
+}

@@ -1,0 +1,339 @@
+{
+  "name": "GH-AIOS | KAS | Website Connector | v1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.request.source.url }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.request.source.name }}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{ $json.request.connector }}",
+              "value2": "website"
+            }
+          ]
+        }
+      },
+      "id": "ca2eebb4-a001-452f-9b08-c468fbda8e48",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nreturn [\n  {\n    json: {\n      execution: item.execution,\n\n      connector: item.connector,\n\n      resource: item.resource,\n\n      content: {\n        contentType: item.extraction.contentType,\n        rawContent: item.extraction.rawContent,\n        contentLength: item.extraction.contentLength\n      },\n\n      metadata: {\n        retrievedAt: item.extraction.retrievedAt,\n        status: item.metadata.status,\n        statusCode: item.metadata.statusCode,\n        headers: item.metadata.headers\n      }\n    }\n  }\n];"
+      },
+      "id": "dcaf3077-9a78-4f35-9882-2f3b2e22a3d5",
+      "name": "Build Acquisition Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "b97d6496-68fa-401a-a319-549cb07929e2",
+      "name": "Return Payload",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        464,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "connector.name",
+              "stringValue": "Website Connector"
+            },
+            {
+              "name": "connector.version",
+              "stringValue": "1.0"
+            },
+            {
+              "name": "connector.runtime.timeout",
+              "type": "numberValue",
+              "numberValue": "30000"
+            },
+            {
+              "name": "connector.runtime.followRedirects",
+              "type": "booleanValue"
+            },
+            {
+              "name": "connector.runtime.responseFormat",
+              "stringValue": "text"
+            },
+            {
+              "name": "connector.runtime.userAgent",
+              "stringValue": "GH-AIOS Knowledge Acquisition Service"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "448db85d-4554-4f2f-86f9-442e361602c0",
+      "name": "Initialize Connector",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -880,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst rawContent = item.data || \"\";\n\nreturn [\n  {\n    json: {\n      execution: {\n        executionId: item.executionId,\n        startedAt: item.startedAt,\n        triggerType: item.triggerType,\n        service: item.service,\n        version: item.version\n      },\n\n      connector: {\n        type: \"website\",\n        name: \"Website Connector\",\n        version: \"1.0\"\n      },\n\n      resource: {\n        sourceType: \"website\",\n        sourceId: item.request.source.id,\n        sourceName: item.request.source.name,\n        sourceUrl: item.request.source.url\n      },\n\n      extraction: {\n        contentType: item.headers?.[\"content-type\"] || \"text/html\",\n        rawContent: rawContent,\n        contentLength: rawContent.length,\n        retrievedAt: new Date().toISOString()\n      },\n\n      metadata: {\n        statusCode: item.statusCode,\n        headers: item.headers,\n        status: item.statusCode === 200 ? \"success\" : \"failed\"\n      }\n    }\n  }\n];"
+      },
+      "id": "82e161f7-44e7-4436-b444-f817178f3357",
+      "name": "Extract Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.request.source.url || $json.sourceUrl}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.connector.runtime.userAgent }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": false,
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 10
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": "={{ $json.connector.runtime.timeout }}"
+        }
+      },
+      "id": "73a922b6-0015-4e72-ac58-c85356df6572",
+      "name": "Fetch Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f747562a-3907-4042-85bf-326876761312",
+              "name": "sourceURL",
+              "value": "={{$json.request.source.url || $json.sourceUrl}}",
+              "type": "string"
+            },
+            {
+              "id": "bc306bbd-5cea-430a-94de-374c69b7bb68",
+              "name": "sourceID",
+              "value": "={{$json.request.source.id}}",
+              "type": "string"
+            },
+            {
+              "id": "d8fe8de5-9e3b-4cb8-8873-115dbe59f590",
+              "name": "sourceName",
+              "value": "={{$json.request.source.name}}",
+              "type": "string"
+            },
+            {
+              "id": "d9f12f33-d489-4f10-bd95-b363f34db77c",
+              "name": "connector",
+              "value": "={{$json.request.connector}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        80
+      ],
+      "id": "247c651d-e9dd-4b1b-b101-efc9c31bd6ad",
+      "name": "Prepare Extraction Context"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "e88533ea-49a4-4570-ab46-c52460f79739",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1328,
+        144
+      ],
+      "id": "cbd2572b-e1f7-487c-bcd5-e4ce0b1d9b56",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Initialize Connector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Acquisition Payload": {
+      "main": [
+        [
+          {
+            "node": "Return Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Connector": {
+      "main": [
+        [
+          {
+            "node": "Prepare Extraction Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Content": {
+      "main": [
+        [
+          {
+            "node": "Build Acquisition Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Extraction Context": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Extract Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1a7934a8-9821-4664-bda3-fd76af871974",
+  "meta": {
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "tC3sydzAzzBLmALl",
+  "tags": []
+}
