@@ -44,15 +44,16 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "htEYZdPXORwApSzM",
+          "value": "pyySSy6E2vPH0dxm",
           "mode": "list",
-          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultUrl": "/workflow/pyySSy6E2vPH0dxm",
           "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "query": "={{ $json.userRequest }}"
+            "query": "={{ $json.userRequest }}",
+            "namespace": "content"
           },
           "matchingColumns": [],
           "schema": [
@@ -94,19 +95,32 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $json.output }}",
+        "text": "={{ $('When Executed by Another Workflow').item.json.userRequest }}",
         "options": {
-          "systemMessage": "You are the Greenhouse Content Service.\n\nYour role is to create communication content for Greenhouse Futures Lab and the Greenhouse Effect Festival.\n\nAlways use the retrieved Greenhouse knowledge provided to you before creating content.\n\nYour responsibilities:\n- Create social media content\n- Write announcements\n- Draft newsletters\n- Create campaign messaging\n- Adapt content for different audiences\n\nBrand voice:\n- Inspiring\n- Youth-focused\n- Climate-conscious\n- Innovative\n- Professional but human\n\nRules:\n- Do not invent facts about Greenhouse.\n- Use only verified information from the knowledge base.\n- Connect climate challenges with solutions, creativity, and action."
+          "systemMessage": "You are the Greenhouse Content Service for the Greenhouse AI Operating System (GH-AIOS).\n\nYour role is to create high-quality communication content for the Greenhouse Effect Initiative, Greenhouse Futures Lab, and the Greenhouse Effect Festival.\n\nAlways use the retrieved Greenhouse knowledge provided below before creating any content.\n\nRetrieved Greenhouse Knowledge:\n\n{{ $json.knowledge }}\n\nYour responsibilities:\n\n- Create social media posts\n- Write announcements\n- Draft newsletters\n- Create campaign messaging\n- Adapt content for different audiences\n- Maintain Greenhouse's tone and mission\n\nBrand Voice:\n\n- Inspiring\n- Youth-focused\n- Climate-conscious\n- Innovative\n- Professional but human\n- Action-oriented\n\nRules:\n\n- Treat the retrieved knowledge as the primary source of truth.\n- Never invent facts about Greenhouse.\n- If information is missing from the retrieved knowledge, clearly state that instead of making assumptions.\n- Combine information across multiple retrieved chunks when appropriate.\n- Connect climate challenges with solutions, creativity, collaboration, and action.\n- Do not mention AI systems, prompts, workflows, or retrieval processes.\n\nOutput Requirements:\n\n- Title (if applicable)\n- Final Content\n- Suggested Call-to-Action (if appropriate)\n- Suggested Hashtags (if appropriate)"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        432,
+        640,
         -48
       ],
       "id": "837eb125-578c-4f78-8c56-ec1b9dbde8f2",
       "name": "Content Brain"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Get chunks returned by the Knowledge Retrieval Service\nconst chunks = data.chunks || [];\n\nconst formattedKnowledge = chunks.map((chunk, index) => {\n  return `### Chunk ${index + 1}\n\nSource: ${chunk.source_name}\nPackage: ${chunk.package_name}\nChunk Index: ${chunk.chunk_index}\nSimilarity Score: ${chunk.distance}\n\nContent:\n${chunk.content}`;\n}).join(\"\\n\\n==================================================\\n\\n\");\n\n// Return clean context for the AI Agent\nreturn [\n  {\n    json: {\n      userRequest: $('When Executed by Another Workflow').first().json.userRequest,\n      knowledge: formattedKnowledge,\n      chunkCount: chunks.length\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        -48
+      ],
+      "id": "fdfd7c0e-f4bc-494a-89f9-cac96a40d835",
+      "name": "Code in JavaScript"
     }
   ],
   "pinData": {},
@@ -137,6 +151,17 @@
       "main": [
         [
           {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
             "node": "Content Brain",
             "type": "main",
             "index": 0
@@ -151,7 +176,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "9047c9b9-974b-46b9-9cac-dd9eeebf8f45",
+  "versionId": "1f6d4324-b6b2-47a6-9107-1f0787f2eb55",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"

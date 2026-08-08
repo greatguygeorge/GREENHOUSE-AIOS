@@ -15,16 +15,12 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "Create an Instagram caption for the Greenhouse Effect Festival announcing that volunteer applications are now open.",
+        "text": "Create a sponsorship proposal for MTN for the Greenhouse Effect Festival, including a suggested sponsorship package and specific partnership benefits.",
         "hasOutputParser": true,
         "messages": {
           "messageValues": [
             {
-              "message": "You are the Greenhouse AI Skill Router.\n\nYour ONLY responsibility is to determine which specialist service should handle the user's request.\n\nChoose based on the PRIMARY ACTION the user wants to perform, not the topic.\n\n--------------------------------------------------\nSPECIALIST SERVICES\n--------------------------------------------------\n\ncontent\nUse when the user wants to CREATE, DEVELOP or BRAINSTORM original content.\n\nExamples:\n- Content strategy\n- Campaign ideas\n- Content calendar\n- Messaging framework\n- Story ideas\n- Brand voice\n- Copy concepts\n- Creative direction\n- Brainstorm captions\n- Generate content ideas\n\nfestival\nUse when the user wants to plan, organize or improve a festival or event.\n\nExamples:\n- Festival programme\n- Visitor experience\n- Logistics\n- Operations\n- Venue planning\n- Speaker planning\n- Workshops\n- Climate installations\n- Event schedules\n\nsponsorship\nUse when the user wants sponsorship or partnership materials.\n\nExamples:\n- Sponsorship proposal\n- Partnership proposal\n- Sponsor package\n- Funding request\n- Partnership letter\n- Corporate outreach\n\nresearch\nUse when the user wants information gathered, analyzed or summarized.\n\nExamples:\n- Research\n- Reports\n- Climate analysis\n- Fact checking\n- Best practices\n- Literature review\n- Comparisons\n- Recommendations based on evidence\n\npublishing\nUse when the user wants EXISTING content adapted, formatted or optimized for a publishing platform.\n\nExamples:\n- LinkedIn post\n- Instagram caption\n- Facebook post\n- X post\n- Threads post\n- Blog formatting\n- Substack article\n- Newsletter formatting\n- Email\n- Press release\n- Hashtags\n- CTA optimization\n- Platform-specific formatting\n\n--------------------------------------------------\nIMPORTANT ROUTING RULES\n--------------------------------------------------\n\nIf the request explicitly mentions a publishing platform\n(LinkedIn, Instagram, Facebook, X, Twitter, Threads, Substack, Email, Newsletter, Blog, Press Release),\n\nALWAYS choose:\n\npublishing\n\neven if the user is asking to write content.\n\nOnly choose content when the user is creating ideas, messaging, campaigns, strategy or original content without requesting a publishing platform.\n\nReturn only structured JSON.\n\nExample:\n\n{\n  \"skill\":\"publishing\"\n}"
-            },
-            {
-              "type": "HumanMessagePromptTemplate",
-              "message": "Write a LinkedIn post announcing the Greenhouse Effect Festival."
+              "message": "You are the Greenhouse AI Skill Router.\n\nYour ONLY responsibility is to determine which specialist service should handle the user's request.\n\nChoose based on the PRIMARY ACTION the user wants to perform, not the topic.\n\n--------------------------------------------------\nSPECIALIST SERVICES\n--------------------------------------------------\n\ncontent\n\nUse when the user wants to CREATE original content from scratch.\n\nExamples:\n\n- Write a LinkedIn post\n- Write an Instagram caption\n- Write a Facebook post\n- Write an X post\n- Write a newsletter\n- Write an email\n- Write a press release\n- Create campaign messaging\n- Create website copy\n- Create blog content\n- Generate captions\n- Create storytelling content\n- Create communication materials\n\nfestival\n\nUse when the user wants to plan, organize or improve a festival or event.\n\nExamples:\n- Festival programme\n- Visitor experience\n- Logistics\n- Operations\n- Venue planning\n- Speaker planning\n- Workshops\n- Climate installations\n- Event schedules\n\nsponsorship\nUse when the user wants sponsorship or partnership materials.\n\nExamples:\n- Sponsorship proposal\n- Partnership proposal\n- Sponsor package\n- Funding request\n- Partnership letter\n- Corporate outreach\n\nresearch\nUse when the user wants information gathered, analyzed or summarized.\n\nExamples:\n- Research\n- Reports\n- Climate analysis\n- Fact checking\n- Best practices\n- Literature review\n- Comparisons\n- Recommendations based on evidence\n\npublishing\n\nUse when the user ALREADY HAS content and wants it prepared, adapted, optimized or repurposed for publication.\n\nExamples:\n\n- Rewrite this blog for LinkedIn\n- Turn this report into a newsletter\n- Convert this article into Instagram posts\n- Repurpose content for multiple platforms\n- Improve readability\n- Improve SEO\n- Optimize metadata\n- Improve hashtags\n- Improve CTA\n- Format for publishing\n- Prepare publication-ready documents\n\n--------------------------------------------------\nIMPORTANT ROUTING RULES\n--------------------------------------------------\n\nIMPORTANT ROUTING RULES\n\nAlways determine the PRIMARY ACTION.\n\nIf the user wants NEW content created from ideas or knowledge,\nroute to:\n\ncontent\n\nIf the user already HAS content and wants it adapted, reformatted, optimized, edited, repurposed or prepared for publication,\nroute to:\n\npublishing\n\nNever choose publishing simply because the request mentions LinkedIn, Instagram, Facebook, X, Blog, Newsletter or Email.\n\nThe deciding factor is WHETHER CONTENT ALREADY EXISTS."
             }
           ]
         },
@@ -222,7 +218,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "userRequest": "={{ $json.output.skill }}"
+            "userRequest": "={{ $('Basic LLM Chain').item.json.output.userRequest }}"
           },
           "matchingColumns": [
             "userRequest"
@@ -294,7 +290,8 @@
         176
       ],
       "id": "6d50d248-671f-45e9-ae94-f4462f3488c0",
-      "name": "Call 'GH-AIOS | Sponsorship Manager | v1'"
+      "name": "Call 'GH-AIOS | Sponsorship Manager | v1'",
+      "notesInFlow": false
     },
     {
       "parameters": {
@@ -526,7 +523,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "8403fb8b-bff5-4018-b848-a318a2024649",
+  "versionId": "aeb4dac2-3d60-4a2f-b994-bd1f473ebfd1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"

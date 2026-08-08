@@ -80,9 +80,10 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "REPLACE_WITH_RSS_CONNECTOR_ID",
+          "value": "9TsPAY6A2gpISoSA",
           "mode": "list",
-          "cachedResultName": "GH-AIOS | RSS Connector | v1"
+          "cachedResultUrl": "/workflow/9TsPAY6A2gpISoSA",
+          "cachedResultName": "GH-AIOS | KAS | RSS Connector | v1"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -90,7 +91,19 @@
             "job": "={{ $json }}"
           },
           "matchingColumns": [],
-          "schema": []
+          "schema": [
+            {
+              "id": "job",
+              "displayName": "job",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
         },
         "options": {}
       },
@@ -107,8 +120,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "REPLACE_WITH_GDRIVE_CONNECTOR_ID",
+          "value": "tjd47Y4U0UoP06Q0",
           "mode": "list",
+          "cachedResultUrl": "/workflow/tjd47Y4U0UoP06Q0",
           "cachedResultName": "GH-AIOS | Google Drive Connector | v1"
         },
         "workflowInputs": {
@@ -117,7 +131,19 @@
             "job": "={{ $json }}"
           },
           "matchingColumns": [],
-          "schema": []
+          "schema": [
+            {
+              "id": "job",
+              "displayName": "job",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
         },
         "options": {}
       },
@@ -173,14 +199,14 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst first = items[0]?.json || {};\n\nconst executionId = first.executionId || \"\";\nconst startedAt = first.startedAt || \"\";\n\nconst finishedAt = new Date().toISOString();\n\nlet successful = 0;\nlet failed = 0;\nlet totalChunks = 0;\nlet totalContentLength = 0;\n\nconst connectors = [];\nconst errors = [];\n\nfor (const item of items) {\n\n  const data = item.json;\n\n  connectors.push({\n    connector: data.connector,\n    source: data.source?.name || \"\",\n    status: data.status,\n    chunkCount: Number(data.chunkCount || 0),\n    contentLength: Number(data.contentLength || 0)\n  });\n\n  if (data.status === \"processed\") {\n    successful++;\n  } else {\n    failed++;\n\n    errors.push({\n      connector: data.connector,\n      source: data.source?.name || \"\",\n      reason: data.error || \"Unknown error\"\n    });\n  }\n\n  totalChunks += Number(data.chunkCount || 0);\n  totalContentLength += Number(data.contentLength || 0);\n}\n\nconst durationMs =\n  startedAt\n    ? new Date(finishedAt).getTime() - new Date(startedAt).getTime()\n    : 0;\n\nreturn [{\n  json: {\n\n    service: \"Knowledge Acquisition Service\",\n\n    version: \"1.1.0\",\n\n    executionId,\n\n    startedAt,\n\n    finishedAt,\n\n    durationMs,\n\n    status: failed === 0\n      ? \"completed\"\n      : \"completed_with_errors\",\n\n    statistics: {\n\n      connectorsExecuted: connectors.length,\n\n      successful,\n\n      failed,\n\n      totalChunks,\n\n      totalContentLength\n\n    },\n\n    connectors,\n\n    errors,\n\n    nextStage: \"Knowledge Storage Service\"\n\n  }\n}];"
+        "jsCode": "const items = $input.all();\n\nconst first = items[0]?.json || {};\n\nconst executionId = first.executionId || \"\";\nconst startedAt = first.startedAt || \"\";\n\nconst finishedAt = new Date().toISOString();\n\nlet successful = 0;\nlet failed = 0;\nlet totalChunks = 0;\nlet totalContentLength = 0;\n\nconst connectors = [];\nconst errors = [];\n\nfor (const item of items) {\n\n  const data = item.json;\n\n  connectors.push({\n    connector: data.connector,\n    source: data.source?.name || \"\",\n    status: data.status,\n    chunkCount: Number(data.chunkCount || 0),\n    contentLength: Number(data.contentLength || 0)\n  });\n\n  if (data.status === \"completed\") {\n    successful++;\n  } else {\n    failed++;\n\n    errors.push({\n      connector: data.connector,\n      source: data.source?.name || \"\",\n      reason: data.error || \"Unknown error\"\n    });\n  }\n\n  totalChunks += Number(data.chunkCount || 0);\n  totalContentLength += Number(data.contentLength || 0);\n}\n\nconst durationMs =\n  startedAt\n    ? new Date(finishedAt).getTime() - new Date(startedAt).getTime()\n    : 0;\n\nreturn [{\n  json: {\n\n    service: \"Knowledge Acquisition Service\",\n\n    version: \"1.1.0\",\n\n    executionId,\n\n    startedAt,\n\n    finishedAt,\n\n    durationMs,\n\n    status: failed === 0\n      ? \"completed\"\n      : \"completed_with_errors\",\n\n    statistics: {\n\n      connectorsExecuted: connectors.length,\n\n      successful,\n\n      failed,\n\n      totalChunks,\n\n      totalContentLength\n\n    },\n\n    connectors,\n\n    errors,\n\n    nextStage: \"Knowledge Storage Service\"\n\n  }\n}];"
       },
       "id": "39df7a28-a9ea-4277-9e91-a7aa0cbe3400",
       "name": "Generate Run Summary",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1680,
+        1888,
         80
       ]
     },
@@ -191,7 +217,7 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        1920,
+        2128,
         80
       ]
     },
@@ -332,7 +358,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\n\nconst requests = [];\n\n// Example Website sources\nconst websiteSources = [\n  {\n    id: \"website-001\",\n    name: \"NASA Climate\",\n    url: \"https://climate.nasa.gov/\"\n  }\n];\n\n// Future:\n// const rssSources = [...]\n// const googleDriveSources = [...]\n\nif (input.connectors.website.enabled) {\n  for (const source of websiteSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"website\",\n          source\n        }\n      }\n    });\n  }\n}\n\nreturn requests;"
+        "jsCode": "const input = $input.first().json;\n\nconst requests = [];\n\n// Example Website sources\nconst websiteSources = [\n  {\n    id: \"website-001\",\n    name: \"NASA Climate\",\n    url: \"https://climate.nasa.gov/\"\n  }\n];\n\n// Example RSS sources\nconst rssSources = [\n  {\n    id: \"rss-001\",\n    name: \"NOAA News RSS\",\n    url: \"https://news.un.org/feed/subscribe/en/news/topic/climate-change/feed/rss.xml\"\n  },\n  {\n    id: \"rss-002\",\n    name: \"Premium Times Nigeria RSS\",\n    url: \"https://reliefweb.int/updates?advanced-search=%28C460%29_%28T4590%29&format=rss\"\n  }\n];\n\n// Example Google Drive sources\nconst googleDriveSources = [\n  {\n    id: \"gdrive-001\",\n    name: \"Test Drive Document\",\n    url: \"https://docs.google.com/document/d/1SAUknoKXtuoIvGhAn3MmmjM45EN_vwewk5vX-OQzH1g/edit?usp=drivesdk\"\n  }\n];\n\nif (input.connectors.website.enabled) {\n  for (const source of websiteSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"website\",\n          source\n        }\n      }\n    });\n  }\n}\n\nif (input.connectors.rss.enabled) {\n  for (const source of rssSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"rss\",\n          source\n        }\n      }\n    });\n  }\n}\n\nif (input.connectors.googleDrive.enabled) {\n  for (const source of googleDriveSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"googleDrive\",\n          source\n        }\n      }\n    });\n  }\n}\n\nreturn requests;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -355,6 +381,65 @@
       ],
       "id": "9326c728-2e13-4b46-a105-77ce0520a0f2",
       "name": "Transform Payload"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QPFWEw7lRFVypGYa",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QPFWEw7lRFVypGYa",
+          "cachedResultName": "GH-AIOS | Knowledge Storage Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processingResult": "={{ $json }}"
+          },
+          "matchingColumns": [
+            "processingResult"
+          ],
+          "schema": [
+            {
+              "id": "processingResult",
+              "displayName": "processingResult",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1648,
+        80
+      ],
+      "id": "08a76c5c-9f71-4680-80c5-5df1d248d927",
+      "name": "Call 'GH-AIOS | Knowledge Storage Service | v1'"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        -320
+      ],
+      "id": "85823a6f-d772-4271-a30e-f4ec9db953f7",
+      "name": "When Executed by Another Workflow"
     }
   ],
   "pinData": {},
@@ -418,7 +503,7 @@
       "main": [
         [
           {
-            "node": "Generate Run Summary",
+            "node": "Call 'GH-AIOS | Knowledge Storage Service | v1'",
             "type": "main",
             "index": 0
           }
@@ -491,7 +576,8 @@
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
     "Generate Acquisition Requests": {
@@ -515,15 +601,37 @@
           }
         ]
       ]
+    },
+    "Call 'GH-AIOS | Knowledge Storage Service | v1'": {
+      "main": [
+        [
+          {
+            "node": "Generate Run Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Initialize Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "bf9d1c1c-3f49-44c9-b4fd-999833bd5469",
+  "versionId": "8d73dc96-905c-4fa9-b1e6-d3e8773840ba",
   "meta": {
     "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
   },

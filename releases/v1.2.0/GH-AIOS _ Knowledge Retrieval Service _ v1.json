@@ -1,0 +1,201 @@
+{
+  "name": "GH-AIOS | Knowledge Retrieval Service | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "queries",
+              "type": "array"
+            },
+            {
+              "name": "namespace"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        -16
+      ],
+      "id": "52eeaadd-bda2-4663-a18b-d017b73ec75f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nomic-embed-text\",\n  \"input\": \"={{ $json.query }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "10fa4f62-f6f2-4265-b5dc-5698ad3cc7dc",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    id,\n    content,\n    package_name,\n    source_name,\n    chunk_index,\n    organization,\n    owner,\n    version,\n    embedding <=> '{{ JSON.stringify($node[\"HTTP Request\"].json.embeddings[0]) }}'::vector AS distance\nFROM knowledge_chunks\nORDER BY embedding <=> '{{ JSON.stringify($node[\"HTTP Request\"].json.embeddings[0]) }}'::vector\nLIMIT 8;\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        960,
+        -16
+      ],
+      "id": "3e6692ae-cb43-424c-af28-a8d46670c484",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "Ks70lg1ebKLZfFBL",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0897f4b-6af0-4f38-84f2-2393e69b3322",
+              "name": "query",
+              "value": "What is Greenhouse Effect Initiative",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "dcd4e116-6c06-4805-8bcd-a374468edadd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        304,
+        192
+      ],
+      "id": "ac46a9e4-f3e2-4cfa-ba82-4733e73dc655",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const chunks = items.map(item => ({\n  id: item.json.id,\n  package_name: item.json.package_name,\n  source_name: item.json.source_name,\n  chunk_index: item.json.chunk_index,\n  content: item.json.content,\n  distance: item.json.distance\n}));\n\nreturn [{\n  json: {\n    success: true,\n    chunk_count: chunks.length,\n    chunks\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        -16
+      ],
+      "id": "5a2bd0c8-91e8-4642-bf3e-be38b91578c5",
+      "name": "Format Retrieved Chunks"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Format Retrieved Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "07c4dd0b-5e46-432c-b2ae-ddc6edd5d810",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "pyySSy6E2vPH0dxm",
+  "tags": []
+}

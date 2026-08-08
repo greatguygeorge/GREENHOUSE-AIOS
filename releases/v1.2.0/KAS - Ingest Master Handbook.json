@@ -1,0 +1,510 @@
+{
+  "name": "KAS - Ingest Master Handbook",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        64
+      ],
+      "id": "08952828-6e42-4ad1-a6ae-156b89eeb0c6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/workspace/Greenhouse-AI-OS/knowledge/source_documents/greehouse-effect-initiative/master-handbook/**/*.md",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        64
+      ],
+      "id": "46631247-6075-48a3-a33e-a7a640c7c17a",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        64
+      ],
+      "id": "effea6c7-fd4c-4ca1-9ae7-2710ae9d2b49",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8cd67b1a-ee1b-45e8-9e78-661a72e6d729",
+              "name": "source_name",
+              "value": "Greenhouse Master Handbook",
+              "type": "string"
+            },
+            {
+              "id": "6d7fe4ea-d4e9-4c40-ac61-9f05264cd6d3",
+              "name": "source_type",
+              "value": "markdown",
+              "type": "string"
+            },
+            {
+              "id": "ce270bb1-61bd-450c-ab9e-e52f7b288115",
+              "name": "organization",
+              "value": "Green House Effect Initiative",
+              "type": "string"
+            },
+            {
+              "id": "12e8dfbd-f7c0-4896-8b02-27c65c38297a",
+              "name": "owner",
+              "value": "Green House Effect Initiative",
+              "type": "string"
+            },
+            {
+              "id": "46b235e8-c0e1-418f-aa06-224230c1fc70",
+              "name": "version",
+              "value": "v1.0",
+              "type": "string"
+            },
+            {
+              "id": "b33a9ad9-663c-4b5e-b708-c61963b04f02",
+              "name": "file_name",
+              "value": "=={{ $binary.data.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "66b4f27b-70ca-482a-8407-49d7b8cd3d3d",
+              "name": "file_path",
+              "value": "=={{ $binary.data.directory + \"/\" + $binary.data.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "4f4106db-0c32-41bd-8aa9-ec913835a849",
+              "name": "document",
+              "value": "=={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        64
+      ],
+      "id": "3cf4920d-ceba-4aff-a81f-142a89f77f1c",
+      "name": "Nomalize Metadata"
+    },
+    {
+      "parameters": {
+        "jsCode": "const CHUNK_SIZE = 1200;\nconst OVERLAP = 200;\n\nconst output = [];\n\nfor (const item of $input.all()) {\n\n  const doc = item.json;\n\n  const text = doc.document || \"\";\n\n  if (!text.trim()) {\n    continue;\n  }\n\n  let chunkIndex = 0;\n  let start = 0;\n\n  while (start < text.length) {\n\n    const end = Math.min(start + CHUNK_SIZE, text.length);\n\n    output.push({\n      json: {\n\n        executionId: $execution.id,\n\n        connector: \"markdown\",\n\n        sourceName: doc.source_name,\n\n        sourceType: doc.source_type,\n\n        organization: doc.organization,\n\n        owner: doc.owner,\n\n        version: doc.version,\n\n        fileName: doc.file_name,\n\n        filePath: doc.file_path,\n\n        chunkId: `${doc.file_name}-${chunkIndex}`,\n\n        chunkIndex,\n\n        chunkText: text.substring(start, end)\n\n      }\n    });\n\n    start += (CHUNK_SIZE - OVERLAP);\n\n    chunkIndex++;\n  }\n\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        64
+      ],
+      "id": "8003535c-17a6-4970-9fcf-3322ee529bf4",
+      "name": "Split Into Sematic Chunks"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/embed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "nomic-embed-text"
+            },
+            {
+              "name": "input",
+              "value": "=={{ $json.chunkText }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        -16
+      ],
+      "id": "73fffc57-6568-488d-9ff6-7149a1eff994",
+      "name": "Generate Embeddings",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const vector = $json.body.embeddings[0];\n\nreturn {\n  ...$json,\n  embedding: \"[\" + vector.join(\",\") + \"]\"\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        64
+      ],
+      "id": "eaabbfaa-af50-443b-9d98-ab38c5589869",
+      "name": "Format Embedding"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "knowledge_chunks",
+          "mode": "list",
+          "cachedResultName": "knowledge_chunks"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "package_name": "=Greenhouse Master Handbook",
+            "source_name": "=={{ $json.sourceName }}",
+            "source_type": "=={{ $json.sourceType }}",
+            "chunk_index": "={{ $json.chunkIndex }}",
+            "content": "=={{ $json.chunkText }}",
+            "embedding": "={{ \"[\" + $json.body.embeddings[0].join(\",\") + \"]\" }}",
+            "execution_id": "=={{ $json.executionId }}",
+            "organization": "=={{ $json.organization }}",
+            "owner": "=={{ $json.owner }}",
+            "file_name": "=={{ $json.fileName }}",
+            "file_path": "=={{ $json.filePath }}",
+            "chunk_id": "=={{ $json.chunkId }}",
+            "version": "=={{ $json.version }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "package_name",
+              "displayName": "package_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_name",
+              "displayName": "source_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_type",
+              "displayName": "source_type",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chunk_index",
+              "displayName": "chunk_index",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "embedding",
+              "displayName": "embedding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "organization",
+              "displayName": "organization",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "owner",
+              "displayName": "owner",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "version",
+              "displayName": "version",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "file_path",
+              "displayName": "file_path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chunk_id",
+              "displayName": "chunk_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        1792,
+        64
+      ],
+      "id": "86ebfa50-f8ec-4e13-943c-b52ccf6e9ac5",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "Ks70lg1ebKLZfFBL",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1344,
+        64
+      ],
+      "id": "899baaa3-85f7-45c2-ba8e-dd52703d4749",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Nomalize Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nomalize Metadata": {
+      "main": [
+        [
+          {
+            "node": "Split Into Sematic Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Sematic Chunks": {
+      "main": [
+        [
+          {
+            "node": "Generate Embeddings",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Embeddings": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Embedding": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Format Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "27ddf173-cd1a-4eef-84ce-5bcef6e92d0b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "nW2S4X9x3yrsEqSZ",
+  "tags": []
+}

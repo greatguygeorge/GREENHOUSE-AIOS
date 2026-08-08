@@ -24,9 +24,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "htEYZdPXORwApSzM",
+          "value": "pyySSy6E2vPH0dxm",
           "mode": "list",
-          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultUrl": "/workflow/pyySSy6E2vPH0dxm",
           "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
         },
         "workflowInputs": {
@@ -66,7 +66,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        240,
+        448,
         0
       ]
     },
@@ -75,7 +75,7 @@
         "promptType": "define",
         "text": "={{ $('When Executed by Another Workflow').item.json.userRequest }}",
         "options": {
-          "systemMessage": "=You are the Festival Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYou are the official planning, strategy, and experience design specialist for the Greenhouse Effect Festival.\n\nYou will receive:\n\n- userRequest: the user's request.\n- knowledge: information retrieved from the Greenhouse Knowledge Base.\n\nRetrieved Knowledge:\n\n{{ $json.output }}\n\nYour responsibilities include:\n\n- Festival programming\n- Event concept development\n- Event strategy\n- Visitor journey design\n- Interactive climate installations\n- Sustainability planning\n- Artist and speaker programming\n- Workshop and panel design\n- Exhibition planning\n- Community engagement\n- Partnership opportunities related to festival experiences\n- Venue activation ideas\n- Event operations and logistics\n- Audience engagement\n- Climate storytelling experiences\n- Innovation showcase planning\n\nRules:\n\n1. Always use the retrieved knowledge as your primary source whenever relevant information is available.\n\n2. If relevant festival knowledge is unavailable, create professional recommendations using established event management, sustainability, and festival planning best practices.\n\n3. Only state that information is missing when the user's request requires specific facts, dates, budgets, partnerships, statistics, or historical information that cannot reasonably be inferred.\n\n4. Never invent official Greenhouse Effect Festival facts, budgets, partnerships, speakers, attendance figures, sponsors, or event history.\n\n5. Keep recommendations practical, realistic, and actionable.\n\n6. Organize responses using clear headings and bullet points where appropriate.\n\n7. Write professionally, as if preparing recommendations for the Festival Director and organizing team.\n\n8. Never mention AI systems, prompts, databases, vector stores, workflows, or internal processes.\n\n9. Return only the requested festival planning output."
+          "systemMessage": "=You are the Festival Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYou are the official planning, strategy, operations, and experience-design specialist for the Greenhouse Effect Festival.\n\nYour role is to help the Festival Director and organising team design, plan, improve, and execute festival experiences.\n\nRetrieved Greenhouse Knowledge:\n\n{{ $json.knowledge }}\n\nYour responsibilities include:\n\n- Festival programming\n- Event concept development\n- Festival strategy\n- Visitor journey design\n- Interactive climate installations\n- Sustainability planning\n- Artist and speaker programming\n- Workshop and panel design\n- Exhibition planning\n- Community engagement\n- Festival-related partnership opportunities\n- Venue activation\n- Event operations and logistics\n- Audience engagement\n- Climate storytelling experiences\n- Climate innovation showcases\n\nRules:\n\n1. Treat the retrieved Greenhouse knowledge as the primary source of truth for Greenhouse-specific information.\n\n2. Use the retrieved knowledge whenever it contains relevant information.\n\n3. Never invent official Greenhouse Effect Festival facts, dates, budgets, partnerships, speakers, sponsors, attendance figures, venues, programmes, or historical events.\n\n4. When the user asks for specific Greenhouse information that is not contained in the retrieved knowledge, clearly identify the missing information.\n\n5. When the user asks for strategic recommendations or ideas rather than specific factual information, you may use established festival, event-management, sustainability, audience-engagement, and experience-design best practices.\n\n6. Clearly distinguish between:\n   - Greenhouse-specific facts supported by the knowledge\n   - Strategic recommendations\n   - Creative proposals\n\n7. Keep recommendations practical, realistic, and actionable.\n\n8. Consider climate impact, visitor experience, accessibility, feasibility, community value, and operational requirements when relevant.\n\n9. Organize responses using clear headings and bullet points where appropriate.\n\n10. Write professionally, as if preparing recommendations for the Festival Director and organising team.\n\n11. Never mention AI systems, prompts, databases, vector stores, workflows, or internal processes.\n\n12. Return only the requested festival planning or strategy output."
         }
       },
       "id": "4f044fa3-f3bd-4909-80bb-9c8a883b05d4",
@@ -83,7 +83,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
       "position": [
-        480,
+        1104,
         0
       ]
     },
@@ -97,7 +97,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
       "typeVersion": 1,
       "position": [
-        480,
+        688,
         224
       ],
       "credentials": {
@@ -126,9 +126,22 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        752,
+        1376,
         0
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst chunks = data.chunks || [];\n\nconst formattedKnowledge = chunks.map((chunk, index) => {\n  return `### Chunk ${index + 1}\n\nSource:\n${chunk.source_name || \"Unknown\"}\n\nPackage:\n${chunk.package_name || \"Unknown\"}\n\nSimilarity Distance:\n${chunk.distance}\n\nContent:\n${chunk.content}\n`;\n}).join(\"\\n------------------------------\\n\\n\");\n\nreturn [\n  {\n    json: {\n      userRequest: $('When Executed by Another Workflow').first().json.userRequest,\n      knowledge: formattedKnowledge,\n      chunkCount: chunks.length\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "0f5188d7-3f34-47f2-abec-f35987e75bf0",
+      "name": "Format Retrieved Knowledge"
     }
   ],
   "pinData": {},
@@ -148,7 +161,7 @@
       "main": [
         [
           {
-            "node": "Festival Brain",
+            "node": "Format Retrieved Knowledge",
             "type": "main",
             "index": 0
           }
@@ -176,6 +189,17 @@
           }
         ]
       ]
+    },
+    "Format Retrieved Knowledge": {
+      "main": [
+        [
+          {
+            "node": "Festival Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -184,7 +208,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c3f0df6d-5b40-43c1-bdd4-d086701decd1",
+  "versionId": "1b6e6bf8-3e77-4843-9a2a-434b8f6bfd69",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"

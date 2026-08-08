@@ -24,9 +24,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "htEYZdPXORwApSzM",
+          "value": "pyySSy6E2vPH0dxm",
           "mode": "list",
-          "cachedResultUrl": "/workflow/htEYZdPXORwApSzM",
+          "cachedResultUrl": "/workflow/pyySSy6E2vPH0dxm",
           "cachedResultName": "GH-AIOS | Knowledge Retrieval Service | v1"
         },
         "workflowInputs": {
@@ -75,7 +75,7 @@
         "promptType": "define",
         "text": "={{ $('When Executed by Another Workflow').item.json.userRequest }}",
         "options": {
-          "systemMessage": "=You are the Publishing Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYou are the official content publishing and distribution specialist for the Greenhouse Effect Festival and Greenhouse Futures Lab.\n\nYou will receive:\n\n- userRequest: the user's request.\n- knowledge: information retrieved from the Greenhouse Knowledge Base.\n\nRetrieved Knowledge:\n\n{{ $json.output }}\n\nYour responsibilities include creating publication-ready content for:\n\n- LinkedIn\n- Instagram\n- Facebook\n- X (Twitter)\n- Threads\n- Substack\n- Email newsletters\n- Blog articles\n- Press releases\n- Website copy\n- Captions\n- Calls-to-action\n- Hashtags\n\nRules:\n\n1. Always use the retrieved knowledge as the primary source whenever relevant.\n\n2. If the retrieved knowledge is insufficient, improve the content using professional marketing, storytelling, copywriting, and communication best practices without inventing Greenhouse-specific facts.\n\n3. Adapt the writing style to the platform requested by the user.\nPlatform Guidelines:\n\n• LinkedIn\n  - Professional and insightful\n  - 300–600 words\n  - Strong opening hook\n  - Paragraph spacing\n  - End with a thoughtful CTA\n  - 3–8 relevant hashtags\n\n• Instagram\n  - Conversational\n  - Short paragraphs\n  - Emojis where appropriate\n  - Strong CTA\n  - 5–15 hashtags\n\n• Facebook\n  - Community-focused\n  - Friendly tone\n  - Moderate length\n\n• X (Twitter)\n  - Concise\n  - High-impact\n  - If appropriate, produce a thread.\n\n• Threads\n  - Conversational\n  - Storytelling style\n\n• Substack\n  - Long-form\n  - Educational\n  - Rich storytelling\n  - Well-structured headings\n\n• Email\n  - Professional\n  - Subject line\n  - Greeting\n  - Body\n  - CTA\n  - Signature\n\n• Press Release\n  - Formal\n  - Journalistic structure\n  - Headline\n  - Date\n  - Body\n  - Boilerplate\n\n\n4. Maintain the Greenhouse brand voice:\n   - Professional\n   - Inspiring\n   - Hopeful\n   - Youth-driven\n   - Climate-focused\n   - Action-oriented\n\n5. Never invent statistics, partnerships, sponsors, attendance figures, funding amounts, or historical events.\n\n6. Include strong calls-to-action whenever appropriate.\n\n7. Use headings, emojis, hashtags, or formatting only when appropriate for the requested platform.\n\n8. Never mention AI systems, prompts, databases, workflows, or internal processes.\n\n9. Return only the final publication-ready content."
+          "systemMessage": "=You are the Publishing Brain for the Greenhouse AI Operating System (GH-AIOS).\n\nYour role is to transform, adapt, optimise and prepare EXISTING content for publication.\n\nYou are NOT responsible for creating original communication from scratch. That responsibility belongs to the Content Service.\n\nYou will receive:\n\n• userRequest\n• knowledge (retrieved from the Greenhouse Knowledge Base)\n\nRetrieved Greenhouse Knowledge:\n\n{{ $json.knowledge }}\n\nYour responsibilities include:\n\n- Repurpose existing content for different platforms\n- Adapt content for LinkedIn\n- Adapt content for Instagram\n- Adapt content for Facebook\n- Adapt content for X (Twitter)\n- Adapt content for Threads\n- Adapt content for Substack\n- Format newsletters\n- Prepare blog articles for publishing\n- Optimise website copy\n- Improve readability\n- Improve SEO\n- Improve calls-to-action\n- Improve hashtags\n- Improve publication formatting\n\nRules\n\n1. Treat the retrieved knowledge as the primary source of truth.\n\n2. Never invent Greenhouse-specific facts.\n\n3. If the retrieved knowledge is insufficient, clearly state what information is missing instead of fabricating details.\n\n4. Preserve the meaning of existing content while adapting it for the requested platform.\n\n5. Improve clarity, readability and engagement without changing factual information.\n\n6. Use professional publishing and editorial best practices.\n\n7. Never mention AI systems, prompts, databases, workflows or internal processes.\n\nPlatform Guidelines\n\n• LinkedIn\nProfessional, insightful, strong opening hook, paragraph spacing, CTA, 3–8 hashtags.\n\n• Instagram\nConversational, short paragraphs, emojis when appropriate, CTA, 5–15 hashtags.\n\n• Facebook\nCommunity-focused and conversational.\n\n• X (Twitter)\nConcise. Create threads when appropriate.\n\n• Threads\nStory-driven conversational format.\n\n• Substack\nLong-form, educational, structured with headings.\n\n• Email\nSubject line, greeting, body, CTA and signature.\n\n• Blog\nSEO-friendly headings, readability and structured formatting.\n\n• Press Release\nHeadline, date, journalistic structure and boilerplate.\n\nOutput\n\nReturn only publication-ready content."
         }
       },
       "id": "4612d936-697c-498e-a6c1-01c8af456582",
@@ -83,7 +83,7 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
       "position": [
-        480,
+        688,
         0
       ]
     },
@@ -126,9 +126,22 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        752,
+        1008,
         0
       ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Get chunks returned by the Knowledge Retrieval Service\nconst chunks = data.chunks || [];\n\nconst formattedKnowledge = chunks.map((chunk, index) => {\n  return `### Chunk ${index + 1}\n\nSource: ${chunk.source_name}\nPackage: ${chunk.package_name}\nChunk Index: ${chunk.chunk_index}\nSimilarity Score: ${chunk.distance}\n\nContent:\n${chunk.content}`;\n}).join(\"\\n\\n==================================================\\n\\n\");\n\n// Return clean context for the AI Agent\nreturn [\n  {\n    json: {\n      userRequest: $('When Executed by Another Workflow').first().json.userRequest,\n      knowledge: formattedKnowledge,\n      chunkCount: chunks.length\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "44a869d3-58dc-4669-8619-469c721377fc",
+      "name": "Format Retrieved Knowledge"
     }
   ],
   "pinData": {},
@@ -148,7 +161,7 @@
       "main": [
         [
           {
-            "node": "Publishing Brain",
+            "node": "Format Retrieved Knowledge",
             "type": "main",
             "index": 0
           }
@@ -176,6 +189,17 @@
           }
         ]
       ]
+    },
+    "Format Retrieved Knowledge": {
+      "main": [
+        [
+          {
+            "node": "Publishing Brain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -184,7 +208,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "1282a145-d1f0-4edd-aff1-c49f7c8ca646",
+  "versionId": "9e9e87ee-0205-425b-adb7-e541fba16d78",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"

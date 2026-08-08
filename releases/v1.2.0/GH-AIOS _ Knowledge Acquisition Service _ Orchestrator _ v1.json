@@ -1,0 +1,641 @@
+{
+  "name": "GH-AIOS | Knowledge Acquisition Service | Orchestrator | v1",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ie1",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{ $execution.id }}"
+            },
+            {
+              "id": "ie2",
+              "name": "startedAt",
+              "type": "string",
+              "value": "={{ $now }}"
+            },
+            {
+              "id": "ie3",
+              "name": "triggerType",
+              "type": "string",
+              "value": "=manual"
+            },
+            {
+              "id": "dbfd9e33-96c0-4716-8c94-f4594cad1e17",
+              "name": "service",
+              "value": "Knowledge Acquisition Service",
+              "type": "string"
+            },
+            {
+              "id": "fb04fe3a-6f5d-4983-8424-84a19f48eb60",
+              "name": "version",
+              "value": "1.1.0",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3bf26d8b-8ec1-40b4-9e6d-e3d3b7d2d163",
+      "name": "Initialize Execution",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tC3sydzAzzBLmALl",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/tC3sydzAzzBLmALl",
+          "cachedResultName": "GH-AIOS | KAS | Website Connector | v1.0"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "0be057e8-75f2-4f74-ad46-ce334c110b6a",
+      "name": "Website Connector",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "9TsPAY6A2gpISoSA",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/9TsPAY6A2gpISoSA",
+          "cachedResultName": "GH-AIOS | KAS | RSS Connector | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job": "={{ $json }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job",
+              "displayName": "job",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "f3c10334-56d0-421b-99b1-e85fbe94dd43",
+      "name": "RSS Connector",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tjd47Y4U0UoP06Q0",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/tjd47Y4U0UoP06Q0",
+          "cachedResultName": "GH-AIOS | Google Drive Connector | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job": "={{ $json }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job",
+              "displayName": "job",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "227c3a48-e4e6-479c-85af-e1dfe4d480b8",
+      "name": "Google Drive Connector",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "6188bebf-e9d3-4ede-8f31-66889dd35e05",
+      "name": "Merge Connector Outputs",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        992,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1se5IaOPI5D8pfqZ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/1se5IaOPI5D8pfqZ",
+          "cachedResultName": "GH-AIOS | KAS | Knowledge Processing Pipeline | v1.0"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "c16d3113-50ba-43d7-854e-3eb65d7813c0",
+      "name": "Send Payload(s) to Processing Pipeline",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst first = items[0]?.json || {};\n\nconst executionId = first.executionId || \"\";\nconst startedAt = first.startedAt || \"\";\n\nconst finishedAt = new Date().toISOString();\n\nlet successful = 0;\nlet failed = 0;\nlet totalChunks = 0;\nlet totalContentLength = 0;\n\nconst connectors = [];\nconst errors = [];\n\nfor (const item of items) {\n\n  const data = item.json;\n\n  connectors.push({\n    connector: data.connector,\n    source: data.source?.name || \"\",\n    status: data.status,\n    chunkCount: Number(data.chunkCount || 0),\n    contentLength: Number(data.contentLength || 0)\n  });\n\n  if (data.status === \"completed\") {\n    successful++;\n  } else {\n    failed++;\n\n    errors.push({\n      connector: data.connector,\n      source: data.source?.name || \"\",\n      reason: data.error || \"Unknown error\"\n    });\n  }\n\n  totalChunks += Number(data.chunkCount || 0);\n  totalContentLength += Number(data.contentLength || 0);\n}\n\nconst durationMs =\n  startedAt\n    ? new Date(finishedAt).getTime() - new Date(startedAt).getTime()\n    : 0;\n\nreturn [{\n  json: {\n\n    service: \"Knowledge Acquisition Service\",\n\n    version: \"1.1.0\",\n\n    executionId,\n\n    startedAt,\n\n    finishedAt,\n\n    durationMs,\n\n    status: failed === 0\n      ? \"completed\"\n      : \"completed_with_errors\",\n\n    statistics: {\n\n      connectorsExecuted: connectors.length,\n\n      successful,\n\n      failed,\n\n      totalChunks,\n\n      totalContentLength\n\n    },\n\n    connectors,\n\n    errors,\n\n    nextStage: \"Knowledge Storage Service\"\n\n  }\n}];"
+      },
+      "id": "39df7a28-a9ea-4277-9e91-a7aa0cbe3400",
+      "name": "Generate Run Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a4ee4757-5cd0-43c8-9cb3-6ec33fce1c89",
+      "name": "Finish",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "id": "120bebbd-6ac2-4253-9d38-d4405b4692d0",
+      "name": "Daily Scheduler",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -624,
+        192
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "da1da6d5-1694-4005-9bd1-8335cedb186b",
+      "name": "Manual Run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nreturn [\n  {\n    json: {\n      ...input,\n\n      connectors: {\n        website: {\n          enabled: true,\n          workflow: \"KAS - Website Connector\"\n        },\n        rss: {\n          enabled: true,\n          workflow: \"KAS - RSS Connector\"\n        },\n        googleDrive: {\n          enabled: true,\n          workflow: \"KAS - Google Drive Connector\"\n        }\n      },\n\n      processingWorkflow: \"KAS - Processing Pipeline\",\n\n      acquisitionMode: \"standard\",\n\n      maxParallelConnectors: 3\n    }\n  }\n];"
+      },
+      "id": "ba8fec6b-b852-440e-ac01-2a926ee05818",
+      "name": "Load Service Configuration",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "11ebdc78-1cc2-4339-9739-767ad198f771",
+                    "leftValue": "={{$json.request.connector}}",
+                    "rightValue": "website",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Website"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "94481111-050c-428d-94b3-71010754480f",
+                    "leftValue": "={{$json.request.connector}}",
+                    "rightValue": "rss",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RSS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "83619732-10f2-4cd5-ac0f-704df2bd373e",
+                    "leftValue": "={{$json.request.connector}}",
+                    "rightValue": "googleDrive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Google Drive"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "No Connectors Enabled"
+        }
+      },
+      "id": "f4303e46-c2eb-4ce8-8aef-afb321657ced",
+      "name": "Connector Dispatcher",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        512,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconst requests = [];\n\n// Example Website sources\nconst websiteSources = [\n  {\n    id: \"website-001\",\n    name: \"NASA Climate\",\n    url: \"https://climate.nasa.gov/\"\n  }\n];\n\n// Example RSS sources\nconst rssSources = [\n  {\n    id: \"rss-001\",\n    name: \"NOAA News RSS\",\n    url: \"https://news.un.org/feed/subscribe/en/news/topic/climate-change/feed/rss.xml\"\n  },\n  {\n    id: \"rss-002\",\n    name: \"Premium Times Nigeria RSS\",\n    url: \"https://reliefweb.int/updates?advanced-search=%28C460%29_%28T4590%29&format=rss\"\n  }\n];\n\n// Example Google Drive sources\nconst googleDriveSources = [\n  {\n    id: \"gdrive-001\",\n    name: \"Test Drive Document\",\n    url: \"https://docs.google.com/document/d/1SAUknoKXtuoIvGhAn3MmmjM45EN_vwewk5vX-OQzH1g/edit?usp=drivesdk\"\n  }\n];\n\nif (input.connectors.website.enabled) {\n  for (const source of websiteSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"website\",\n          source\n        }\n      }\n    });\n  }\n}\n\nif (input.connectors.rss.enabled) {\n  for (const source of rssSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"rss\",\n          source\n        }\n      }\n    });\n  }\n}\n\nif (input.connectors.googleDrive.enabled) {\n  for (const source of googleDriveSources) {\n    requests.push({\n      json: {\n        ...input,\n\n        request: {\n          connector: \"googleDrive\",\n          source\n        }\n      }\n    });\n  }\n}\n\nreturn requests;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        80
+      ],
+      "id": "4443ab6f-56ea-42eb-ac1a-20f9e1b6dcc6",
+      "name": "Generate Acquisition Requests"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nreturn [{\n  json: {\n    executionId: input.executionId ?? \"\",\n    startedAt: input.startedAt ?? \"\",\n\n    request: {\n      connector: input.resource.sourceType,\n      source: {\n        id: input.resource.sourceId,\n        name: input.resource.sourceName,\n        url: input.resource.sourceUrl\n      }\n    },\n\n    extraction: {\n      contentType: input.content.contentType,\n      rawContent: input.content.rawContent,\n      contentLength: input.content.contentLength\n    },\n\n    metadata: input.metadata,\n    connector: input.connector\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        80
+      ],
+      "id": "9326c728-2e13-4b46-a105-77ce0520a0f2",
+      "name": "Transform Payload"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QPFWEw7lRFVypGYa",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QPFWEw7lRFVypGYa",
+          "cachedResultName": "GH-AIOS | Knowledge Storage Service | v1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "processingResult": "={{ $json }}"
+          },
+          "matchingColumns": [
+            "processingResult"
+          ],
+          "schema": [
+            {
+              "id": "processingResult",
+              "displayName": "processingResult",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1648,
+        80
+      ],
+      "id": "08a76c5c-9f71-4680-80c5-5df1d248d927",
+      "name": "Call 'GH-AIOS | Knowledge Storage Service | v1'"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -608,
+        -320
+      ],
+      "id": "85823a6f-d772-4271-a30e-f4ec9db953f7",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Initialize Execution": {
+      "main": [
+        [
+          {
+            "node": "Load Service Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website Connector": {
+      "main": [
+        [
+          {
+            "node": "Merge Connector Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Connector": {
+      "main": [
+        [
+          {
+            "node": "Merge Connector Outputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Drive Connector": {
+      "main": [
+        [
+          {
+            "node": "Merge Connector Outputs",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Connector Outputs": {
+      "main": [
+        [
+          {
+            "node": "Transform Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payload(s) to Processing Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Call 'GH-AIOS | Knowledge Storage Service | v1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Run Summary": {
+      "main": [
+        [
+          {
+            "node": "Finish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Scheduler": {
+      "main": [
+        [
+          {
+            "node": "Initialize Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Run": {
+      "main": [
+        [
+          {
+            "node": "Initialize Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Service Configuration": {
+      "main": [
+        [
+          {
+            "node": "Generate Acquisition Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Connector Dispatcher": {
+      "main": [
+        [
+          {
+            "node": "Website Connector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS Connector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Drive Connector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Generate Acquisition Requests": {
+      "main": [
+        [
+          {
+            "node": "Connector Dispatcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Payload": {
+      "main": [
+        [
+          {
+            "node": "Send Payload(s) to Processing Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'GH-AIOS | Knowledge Storage Service | v1'": {
+      "main": [
+        [
+          {
+            "node": "Generate Run Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Initialize Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8d73dc96-905c-4fa9-b1e6-d3e8773840ba",
+  "meta": {
+    "instanceId": "9218442d73072d97d7f46faefe741fecc9302eb6a3027f8788e9048cb68b2ef3"
+  },
+  "nodeGroups": [],
+  "id": "NFG89XxyucrSqqIR",
+  "tags": []
+}

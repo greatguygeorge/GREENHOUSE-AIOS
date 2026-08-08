@@ -8,6 +8,62 @@ All notable changes to GH-AIOS are documented here.
 
 \---
 
+\## v1.2.0 — Knowledge-Connected Backend
+
+August 2026
+
+
+
+\### Added
+
+\- Centralized Knowledge Acquisition Pipeline (KAP) architecture.
+
+\- KAS Orchestrator workflow for coordinated knowledge acquisition.
+
+\- Master Handbook ingestion workflow.
+
+\- ADR-004 documenting the Knowledge Acquisition Pipeline.
+
+\- v1.2.0 release snapshots for the updated backend workflows.
+
+
+
+\### Updated
+
+\- AI Gateway routing and specialist service integration.
+
+\- Knowledge Retrieval Service with the current retrieval pipeline.
+
+\- Research Service with retrieved-knowledge integration.
+
+\- Content Service with retrieved-knowledge integration.
+
+\- Festival Service with retrieved-knowledge integration.
+
+\- Publishing Service with retrieved-knowledge integration.
+
+\- Sponsorship Manager with retrieved-knowledge integration.
+
+
+
+\### Backend milestone
+
+\- Completed end-to-end knowledge retrieval from PostgreSQL/pgvector.
+
+\- Connected retrieved Greenhouse knowledge to the Research, Content, Festival, Publishing, and Sponsorship services.
+
+\- Validated specialist-service routing through the AI Gateway.
+
+\- Validated end-to-end retrieval and specialist response generation.
+
+
+
+\### Release status
+
+\- v1.0.0 remains frozen as the initial stable release.
+
+\- v1.2.0 represents the current knowledge-connected backend milestone.
+
 
 
 \# Version 1.1.0
